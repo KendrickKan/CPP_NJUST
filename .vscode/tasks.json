@@ -1,0 +1,37 @@
+{
+    "version": "2.0.0",
+    "command": "g++",
+    "args": [
+        "-g",
+        "${file}",
+        "-o",
+        // "${fileBasenameNoExtension}.exe"
+        "${fileDirname}/${fileBasenameNoExtension}.exe"
+        // $ {workspaceFolder} - 在VS Code中打开的文件夹的路径
+        // $ {workspaceFolderBasename} - VS代码中打开的文件夹的名称，没有任何斜杠（/）
+        // $ {file} - 当前打开的文件
+        // $ {relativeFile} - 当前打开的文件相对于workspaceFolder
+        // $ {fileBasename} - 当前打开文件的基本名称
+        // $ {fileBasenameNoExtension} - 当前打开文件的基本名称，没有文件扩展名
+        // $ {fileDirname} - 当前打开文件的目录名
+        // $ {fileExtname} - 当前打开文件的扩展名
+        // $ {cwd} - 任务运行器在启动时的当前工作目录
+        // $ {lineNumber} - 活动文件中当前选定的行号
+        // $ {selectedText} - 活动文件中当前选定的文本
+    ], // 编译命令参数
+    "problemMatcher": {
+        "owner": "cpp",
+        "fileLocation": [
+            "relative",
+            "${workspaceFolder}"
+        ],
+        "pattern": {
+            "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+            "file": 1,
+            "line": 2,
+            "column": 3,
+            "severity": 4,
+            "message": 5
+        }
+    }
+}
