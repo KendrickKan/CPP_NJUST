@@ -1,8 +1,8 @@
 /*
  * @Author: KendrickKan 
- * @Date: 2020-11-09 16:32:50 
+ * @Date: 2020-11-14 13:26:20 
  * @Last Modified by: KendrickKan
- * @Last Modified time: 2020-11-09 17:21:29
+ * @Last Modified time: 2020-11-14 13:28:22
  */
 #include <bits/stdc++.h>
 #define FastIO ios_base::sync_with_stdio(false), cin.tie(NULL), cout.tie(NULL)
@@ -21,90 +21,95 @@ using namespace std;
 typedef long long ll;
 typedef pair<int, int> pii;
 typedef pair<ll, ll> pll;
-int l, r, c;
-int beginx, beginy, beginz;
-int overx, overy, overz;
-struct node
+
+const int maxn = 310;
+int dir[8][2] = {{-1, -2}, {-2, -1}, {-2, 1}, {-1, 2}, {1, 2}, {2, 1}, {2, -1}, {1, -2}};
+int vis[maxn][maxn], sx, sy, tx, ty, n, cnt, mp[maxn][maxn];
+
+typedef struct Node
 {
-    int x, y, z;
-    int step;
-};
-char mp[55][55][55];
-bool vis[55][55][55];
-int dir[6][3] = {{0, 1, 0}, {0, -1, 0}, {1, 0, 0}, {-1, 0, 0}, {0, 0, 1}, {0, 0, -1}};
-bool check(int x, int y, int z)
+    int x, y, step;
+} Node;
+
+void dbfs()
 {
-    if (x < 0 || y < 0 || z < 0 || x >= l || y >= r || z >= c || mp[x][y][z] == '#' || vis[x][y][z] == 1)
-        return false;
-    return true;
-}
-int bfs()
-{
-    node nown, nextn;
-    nown.x = beginx;
-    nown.y = beginy;
-    nown.z = beginz;
-    vis[beginx][beginy][beginz] = 1;
-    nown.step = 0;
-    queue<node> q;
-    q.push(nown);
-    while (!q.empty())
+    memset(vis, 0, sizeof(vis));
+    memset(mp, 0, sizeof(mp));
+    cnt = 0;
+    queue<Node> q0, q1;
+    Node tmp, nxt;
+    tmp.x = sx, tmp.y = sy, tmp.step = 0;
+    vis[sx][sy] = 2;
+    q0.push(tmp);
+    tmp.x = tx, tmp.y = ty, tmp.step = 0;
+    vis[tx][ty] = 1;
+    q1.push(tmp);
+    while (!q0.empty() || !q1.empty())
     {
-        nown = q.front();
-        q.pop();
-        if (mp[nown.x][nown.y][nown.z] == 'E')
-            return nown.step;
-        rep(i, 0, 6)
+        if (!q0.empty())
         {
-            //int temp1 = dir[i][0];
-            //int temp2 = dir[i][1];
-            //int temp3 = dir[i][2];
-            nextn.x = nown.x + dir[i][0];
-            nextn.y = nown.y + dir[i][1];
-            nextn.z = nown.z + dir[i][2];
-            if (check(nextn.x, nextn.y, nextn.z))
+            tmp = q0.front();
+            q0.pop();
+            for (int i = 0; i < 8; i++)
             {
-                vis[nextn.x][nextn.y][nextn.z] = 1;
-                nextn.step = nown.step + 1;
-                q.push(nextn);
+                nxt.x = tmp.x + dir[i][0];
+                nxt.y = tmp.y + dir[i][1];
+                nxt.step = tmp.step + 1;
+                if (nxt.x >= n || nxt.x < 0 || nxt.y >= n || nxt.y < 0 || vis[nxt.x][nxt.y] == 2)
+                    continue;
+                if (vis[nxt.x][nxt.y] == 1)
+                {
+                    cnt = nxt.step + mp[nxt.x][nxt.y];
+                    return;
+                }
+                vis[nxt.x][nxt.y] = 2;
+                mp[nxt.x][nxt.y] = nxt.step;
+                q0.push(nxt);
+            }
+        }
+        if (!q1.empty())
+        {
+            tmp = q1.front();
+            q1.pop();
+            for (int i = 0; i < 8; i++)
+            {
+                nxt.x = tmp.x + dir[i][0];
+                nxt.y = tmp.y + dir[i][1];
+                nxt.step = tmp.step + 1;
+                if (nxt.x >= n || nxt.x < 0 || nxt.y >= n || nxt.y < 0 || vis[nxt.x][nxt.y] == 1)
+                    continue;
+                if (vis[nxt.x][nxt.y] == 2)
+                {
+                    cnt = nxt.step + mp[nxt.x][nxt.y];
+                    return;
+                }
+                vis[nxt.x][nxt.y] = 1;
+                mp[nxt.x][nxt.y] = nxt.step;
+                q1.push(nxt);
             }
         }
     }
-    return 0;
 }
+
 int main()
 {
     FastIO;
-    while (cin >> l >> r >> c && (l || r || c))
+    int T;
+    cin >> T;
+    while (T--)
     {
-        rep(i, 0, l)
+        cin >> n;
+        cin >> sx >> sy >> tx >> ty;
+        if (sx == tx && sy == ty)
         {
-            rep(j, 0, r)
-            {
-                rep(k, 0, c)
-                {
-                    cin >> mp[i][j][k];
-                    if (mp[i][j][k] == 'S')
-                    {
-                        beginx = i;
-                        beginy = j;
-                        beginz = k;
-                    }
-                    if (mp[i][j][k] == 'E')
-                    {
-                        overx = i;
-                        overy = j;
-                        overz = k;
-                    }
-                }
-            }
+            cout << 0 << endl;
         }
-        mem0(vis);
-        int ans = bfs();
-        if (ans)
-            cout << "Escaped in " << ans << " minute(s)." << endl;
         else
-            cout << "Trapped!" << endl;
+        {
+            dbfs();
+            cout << cnt << endl;
+        }
     }
+
     return 0;
 }
