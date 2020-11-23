@@ -20,12 +20,25 @@ typedef pair<ll, ll> pll;
 int main()
 {
     FastIO;
-    int x, y;
-    float area;
-    cin >> x >> y;
-    area = 10000 * 1.0 / 2 - y*1.0*(100-x)/2-x*1.0*y-(100-x)*1.0*(100-y)/2;
-   // area = 10000 * 1.0 / 2 - 100 * 1.0 / 2 * (100 - x + y);
-    cout << area;
-
+    string str;
+    getline(cin, str);
+    string t;
+    cin >> t;
+    int a[26];
+    mem0(a);
+    rep(i, 0, t.length())
+    {
+        a[t[i] - 'a']++;
+    }
+    rep(i, 0, str.length())
+    {
+        if ((str[i] - 'a') >= 0 && (str[i] - 'a') < 26)
+        {
+            if (a[str[i] - 'a'] == 0)
+                cout << str[i];
+        }
+        else
+            cout << str[i];
+    }
     return 0;
 }

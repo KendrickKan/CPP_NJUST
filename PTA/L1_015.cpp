@@ -20,12 +20,17 @@ typedef pair<ll, ll> pll;
 int main()
 {
     FastIO;
-    int x, y;
-    float area;
-    cin >> x >> y;
-    area = 10000 * 1.0 / 2 - y*1.0*(100-x)/2-x*1.0*y-(100-x)*1.0*(100-y)/2;
-   // area = 10000 * 1.0 / 2 - 100 * 1.0 / 2 * (100 - x + y);
-    cout << area;
-
+    int t;
+    char a;
+    cin >> t;
+    cin >> a;
+    rep(i, 0, (t + 1) / 2)
+    {
+        rep(j, 0, t)
+        {
+            cout << a;
+        }
+        cout << endl;
+    }
     return 0;
 }
