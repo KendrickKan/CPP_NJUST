@@ -20,12 +20,26 @@ typedef pair<ll, ll> pll;
 int main()
 {
     FastIO;
-    int x, y;
-    float area;
-    cin >> x >> y;
-    area = 10000 * 1.0 / 2 - y*1.0*(100-x)/2-x*1.0*y-(100-x)*1.0*(100-y)/2;
-   // area = 10000 * 1.0 / 2 - 100 * 1.0 / 2 * (100 - x + y);
-    cout << area;
-
+    string str;
+    cin >> str;
+    bool iffu = false;
+    if (str[0] == '-')
+    {
+        iffu = true;
+    }
+    int len = str.length() - (iffu ? 1 : 0);
+    int twonum = 0;
+    for (int i = iffu ? 1 : 0; i < str.length(); i++)
+    {
+        if (str[i] == '2')
+        {
+            twonum++;
+        }
+    }
+    bool ifeven = false;
+    if ((str[str.length() - 1] - '0') % 2 == 0)
+        ifeven = true;
+    double ans = twonum * 1.0 / len * (1.0 + (iffu ? 0.5 : 0)) * (ifeven ? 2.0 : 1.0) * 100;
+    printf("%.2f%%",ans);
     return 0;
 }

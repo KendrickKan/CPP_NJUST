@@ -21,11 +21,29 @@ int main()
 {
     FastIO;
     int x, y;
-    float area;
     cin >> x >> y;
-    area = 10000 * 1.0 / 2 - y*1.0*(100-x)/2-x*1.0*y-(100-x)*1.0*(100-y)/2;
-   // area = 10000 * 1.0 / 2 - 100 * 1.0 / 2 * (100 - x + y);
-    cout << area;
-
+    int t;
+    cin >> t;
+    int jia, yi;
+    jia = yi = 0;
+    while (t-- && jia <= x && yi <= y)
+    {
+        int a, a1, b, b1;
+        cin >> a >> a1 >> b >> b1;
+        int num = a + b;
+        if (a1 != b1)
+        {
+            if (a1 == num)
+                jia++;
+            else if (b1 == num)
+                yi++;
+        }
+    }
+    if (jia == (x + 1))
+        cout << "A" << endl
+             << yi;
+    else
+        cout << "B" << endl
+             << jia;
     return 0;
 }

@@ -29,21 +29,41 @@ int main()
     cin >> t;
     while (t--)
     {
-        int kmap[105][105];
+        char kmap[105][105];
         int n, m;
         cin >> n >> m;
         priority_queue<node> vec;
+        int ans = 0;
         rep(i, 0, n)
         {
             rep(j, 0, m)
             {
                 cin >> kmap[i][j];
-                if (kmap[i][j] == 1)
+                if (kmap[i][j] == '1')
                 {
-                    node t;
-                    t.x = i + 1;
-                    t.y = i + 1;
-                    vec.push(t);
+                    ans += 3;
+                }
+            }
+        }
+        cout << ans << endl;
+        rep(i, 0, n)
+        {
+            rep(j, 0, m)
+            {
+                if (kmap[i][j] == '1')
+                {
+                    int fx = 1, fy = 1;
+                    if (i == n - 1)
+                    {
+                        fx = -1;
+                    }
+                    if (j == m - 1)
+                    {
+                        fy = -1;
+                    }
+                    cout << i + 1 << " " << j + 1 << " " << i + 1 << " " << j + 1 + fy << " " << i + 1 + fx << " " << j + 1 + fy << endl;
+                    cout << i + 1 << " " << j + 1 << " " << i + 1 << " " << j + 1 + fy << " " << i + 1 + fx << " " << j + 1 << endl;
+                    cout << i + 1 << " " << j + 1 << " " << i + 1 + fx << " " << j + 1 << " " << i + 1 + fx << " " << j + 1 + fy << endl;
                 }
             }
         }
