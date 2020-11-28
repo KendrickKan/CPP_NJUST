@@ -4,6 +4,8 @@
         "ostream": "cpp",
         "iosfwd": "cpp",
         "random": "cpp",
-        "ratio": "cpp"
+        "ratio": "cpp",
+        "sstream": "cpp",
+        "regex": "cpp"
     }
 }
