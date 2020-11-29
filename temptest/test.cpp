@@ -11,7 +11,8 @@
 #define fi first
 #define se second
 #define EPS 1e-10
-#define MOD 1e9 + 7
+const int MOD = 1e9 + 7;
+//INT_MAX <limits>
 #define PI acos(-1)
 using namespace std;
 typedef long long ll;
@@ -20,6 +21,6 @@ typedef pair<ll, ll> pll;
 int main()
 {
     FastIO;
-    
+
     return 0;
 }
