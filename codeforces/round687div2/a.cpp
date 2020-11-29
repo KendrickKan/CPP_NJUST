@@ -20,9 +20,18 @@ typedef pair<ll, ll> pll;
 int main()
 {
     FastIO;
-    int i = 3;
-    int n[3][3] = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
-    cout<<n[n[6/i][5%i]%i][2*i/4];
-
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        int n, m, r, c;
+        cin >> n >> m >> r >> c;
+        int a, b, e, d;
+        a = abs(n - r) + abs(m - c);
+        b = abs(1 - r) + abs(m - c);
+        e = abs(1 - r) + abs(1 - c);
+        d = abs(n - r) + abs(1 - c);
+        cout << max(a, max(b, max(e, d))) << endl;
+    }
     return 0;
 }
