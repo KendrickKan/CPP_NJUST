@@ -8,19 +8,20 @@ bool ifseven(int x)
 
     else
     {
-        string a = "";
+        // string a = "";
         while (x != 0)
         {
             int m = x % 10;
-            x /= 10;
-            a += ('0' + m);
-        }
-        for (int i = 0; i < a.length(); i++)
-            if (a[i] == '7')
-            {
+            if (m == 7)
                 return 1;
-                break;
-            }
+            x /= 10;
+            // a += ('0' + m);
+        }
+        // for (int i = 0; i < a.length(); i++)
+        //     if (a[i] == '7')
+        //     {
+        //         return 1;
+        //     }
         return false;
     }
 }

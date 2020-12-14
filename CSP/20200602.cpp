@@ -9,12 +9,16 @@ int main()
     int n, a, b;
     cin >> n >> a >> b;
     ll ans = 0;
-    vector< pair<int, int> > veca, vecb;
+    vector<pair<int, int>> veca, vecb;
     for (int i = 0; i < a; i++)
     {
         int x, y;
         cin >> x >> y;
-        veca.push_back(make_pair(x, y));
+        pair<int, int> p;
+        p.first = x;
+        p.second = y;
+        veca.push_back(p);
+        //veca.push_back(make_pair(x, y));
     }
     for (int i = 0; i < b; i++)
     {
