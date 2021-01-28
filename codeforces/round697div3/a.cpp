@@ -1,3 +1,9 @@
+/*
+ * @Author: KendrickKan 
+ * @Date: 2021-01-28 20:18:03 
+ * @Last Modified by: KendrickKan
+ * @Last Modified time: 2021-01-28 20:23:50
+ */
 #include <bits/stdc++.h>
 #define FastIO ios_base::sync_with_stdio(false), cin.tie(NULL), cout.tie(NULL)
 #define rep(i, a, b) for (int i = a; i < b; i++)
@@ -20,6 +26,20 @@ typedef pair<ll, ll> pll;
 int main()
 {
     FastIO;
-
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        ll n;
+        cin >> n;
+        while (n % 2 == 0)
+        {
+            n /= 2;
+        }
+        if (n != 1)
+            cout << "YES" << endl;
+        else
+            cout << "NO" << endl;
+    }
     return 0;
 }

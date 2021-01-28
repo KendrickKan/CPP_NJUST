@@ -1,3 +1,4 @@
+//ctrl alt i new-head
 #include <bits/stdc++.h>
 #define FastIO ios_base::sync_with_stdio(false), cin.tie(NULL), cout.tie(NULL)
 #define rep(i, a, b) for (int i = a; i < b; i++)
@@ -20,6 +21,29 @@ typedef pair<ll, ll> pll;
 int main()
 {
     FastIO;
-
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        int n;
+        cin >> n;
+        string str;
+        cin >> str;
+        bool flag = false;
+        for (int i = n - 1; i >= n / 2; i--)
+        {
+            if (str[i] != ')')
+            {
+                flag = true;
+                break;
+            }
+        }
+        if (flag)
+        {
+            cout << "NO" << endl;
+        }
+        else
+            cout << "YES" << endl;
+    }
     return 0;
 }

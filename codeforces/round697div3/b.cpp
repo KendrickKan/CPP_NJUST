@@ -1,3 +1,9 @@
+/*
+ * @Author: KendrickKan 
+ * @Date: 2021-01-28 20:25:14 
+ * @Last Modified by: KendrickKan
+ * @Last Modified time: 2021-01-28 20:32:41
+ */
 #include <bits/stdc++.h>
 #define FastIO ios_base::sync_with_stdio(false), cin.tie(NULL), cout.tie(NULL)
 #define rep(i, a, b) for (int i = a; i < b; i++)
@@ -20,6 +26,26 @@ typedef pair<ll, ll> pll;
 int main()
 {
     FastIO;
-
+    set<int> sex;
+    rep(i, 0, 1000)
+    {
+        rep(j, 0, 1000)
+        {
+            sex.insert(i * 2020 + j * 2021);
+        }
+    }
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        int n;
+        cin >> n;
+        if (sex.find(n) != sex.end())
+        {
+            cout << "YES" << endl;
+        }
+        else
+            cout << "NO" << endl;
+    }
     return 0;
 }

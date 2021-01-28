@@ -1,3 +1,4 @@
+//ctrl alt i new-head
 #include <bits/stdc++.h>
 #define FastIO ios_base::sync_with_stdio(false), cin.tie(NULL), cout.tie(NULL)
 #define rep(i, a, b) for (int i = a; i < b; i++)
@@ -20,6 +21,16 @@ typedef pair<ll, ll> pll;
 int main()
 {
     FastIO;
-
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        int a, b, c;
+        cin >> a >> b >> c;
+        if ((a + b + c) % 9 == 0 && (a >= ((a + b + c) / 9)) && (b >= ((a + b + c) / 9)) && (c >= ((a + b + c) / 9)))
+            cout << "YES" << endl;
+        else
+            cout << "NO" << endl;
+    }
     return 0;
 }
