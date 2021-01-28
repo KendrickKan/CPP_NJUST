@@ -1,3 +1,4 @@
+//ctrl alt i new-head
 #include <bits/stdc++.h>
 #define FastIO ios_base::sync_with_stdio(false), cin.tie(NULL), cout.tie(NULL)
 #define rep(i, a, b) for (int i = a; i < b; i++)
@@ -20,6 +21,27 @@ typedef pair<ll, ll> pll;
 int main()
 {
     FastIO;
-
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        int n;
+        cin >> n;
+        int a[55];
+        mem0(a);
+        set<int> m;
+        rep(i, 0, n)
+        {
+            cin >> a[i];
+        }
+        rep(i, 1, n)
+        {
+            for (int j = i - 1; j >= 0; j--)
+            {
+                m.insert(abs(a[i] - a[j]));
+            }
+        }
+        cout << m.size() << endl;
+    }
     return 0;
 }
