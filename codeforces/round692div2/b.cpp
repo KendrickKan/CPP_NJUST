@@ -18,15 +18,36 @@ using namespace std;
 typedef long long ll;
 typedef pair<int, int> pii;
 typedef pair<ll, ll> pll;
+bool isPrime(int n)
+{
+    int i;
+    for (i = 2; i <= sqrt(n); i++)
+    {
+        if ((n % i) == 0)
+            return false;
+    }
+    return true;
+}
+bool isp[200300];
 int main()
 {
     FastIO;
     int t;
     cin >> t;
+    // rep(i, 0, 200300)
+    // {
+    // }
     while (t--)
     {
         int d;
         cin >> d;
+        int x = 1 + d, y = 1 + d * 2;
+        while (!isPrime(x))
+            x++;
+        y = x + d;
+        while (!isPrime(y))
+            y++;
+        cout << x * y << endl;
     }
     return 0;
 }
