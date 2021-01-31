@@ -1,5 +1,10 @@
+/*
+ * @Author: KendrickKan 
+ * @Date: 2021-01-29 00:15:13 
+ * @Last Modified by: KendrickKan
+ * @Last Modified time: 2021-01-29 00:24:17
+ */
 #include <bits/stdc++.h>
-using namespace std;
 #define FastIO ios_base::sync_with_stdio(false), cin.tie(NULL), cout.tie(NULL)
 #define rep(i, a, b) for (int i = a; i < b; i++)
 #define repp(i, a, b) for (int i = a; i <= b; i++)
@@ -14,31 +19,25 @@ using namespace std;
 const int MOD = 1e9 + 7;
 //INT_MAX <limits>
 #define PI acos(-1)
-template <typename T>
-void read(T &t)
-{
-    t = 0;
-    char ch = getchar();
-    int f = 1;
-    while (ch < '0' || ch > '9')
-    {
-        if (ch == '-')
-            f = -1;
-        ch = getchar();
-    }
-    do
-    {
-        (t *= 10) += ch - '0';
-        ch = getchar();
-    } while ('0' <= ch && ch <= '9');
-    t *= f;
-}
+using namespace std;
 typedef long long ll;
 typedef pair<int, int> pii;
 typedef pair<ll, ll> pll;
+ll a[200005];
 int main()
 {
     FastIO;
-    
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        int n;
+        cin >> n;
+        mem0(a);
+        rep(i, 0, n * 2)
+        {
+            cin >> a[i];
+        }
+    }
     return 0;
 }

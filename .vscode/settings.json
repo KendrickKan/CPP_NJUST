@@ -6,7 +6,8 @@
         "random": "cpp",
         "ratio": "cpp",
         "sstream": "cpp",
-        //"regex": "cpp",
-        //"cmath": "cpp"
+        "deque": "cpp",
+        "string": "cpp",
+        "vector": "cpp"
     }
 }
