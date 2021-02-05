@@ -39,6 +39,56 @@ typedef pair<ll, ll> pll;
 int main()
 {
     FastIO;
-    
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        int x, y;
+        cin >> x >> y;
+        string str;
+        cin >> str;
+        int u = 0, d = 0, r = 0, l = 0;
+        rep(i, 0, str.length())
+        {
+            if (str[i] == 'R')
+                r++;
+            if (str[i] == 'L')
+                l++;
+            if (str[i] == 'U')
+                u++;
+            if (str[i] == 'D')
+                d++;
+        }
+        bool flag1 = false;
+        bool flag2 = false;
+        if (x == 0)
+            flag1 = true;
+        else if (x < 0)
+        {
+            if (l >= abs(x))
+                flag1 = true;
+        }
+        else if (x > 0)
+        {
+            if (r >= x)
+                flag1 = true;
+        }
+        if (y == 0)
+            flag2 = true;
+        else if (y < 0)
+        {
+            if (d >= abs(y))
+                flag2 = true;
+        }
+        else if (y > 0)
+        {
+            if (u >= y)
+                flag2 = true;
+        }
+        if (flag1 && flag2)
+            cout << "YES" << endl;
+        else
+            cout << "NO" << endl;
+    }
     return 0;
 }

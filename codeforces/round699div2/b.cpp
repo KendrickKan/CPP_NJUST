@@ -36,9 +36,63 @@ void read(T &t)
 typedef long long ll;
 typedef pair<int, int> pii;
 typedef pair<ll, ll> pll;
+int a[105];
+bool check(int n)
+{
+    rep(i, 0, n - 1)
+    {
+        if (a[i] < a[i + 1])
+            return false;
+    }
+    return true;
+}
 int main()
 {
     FastIO;
-    
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        int n, k;
+        cin >> n >> k;
+        mem0(a);
+        rep(i, 0, n)
+        {
+            cin >> a[i];
+        }
+        rep(i, 0, k)
+        {
+            if (check(n))
+            {
+                cout << -1 << endl;
+                break;
+            }
+            else
+            {
+                if (i < k - 1)
+                {
+                    rep(i, 0, n - 1)
+                    {
+                        if (a[i] < a[i + 1])
+                        {
+                            a[i]++;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    rep(i, 0, n - 1)
+                    {
+                        if (a[i] < a[i + 1])
+                        {
+                            cout << i + 1 << endl;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
     return 0;
 }
