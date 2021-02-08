@@ -36,9 +36,35 @@ void read(T &t)
 typedef long long ll;
 typedef pair<int, int> pii;
 typedef pair<ll, ll> pll;
+const int maxn = 100005;
+int n;
+int a[maxn];
+void find(int x)
+{
+    if (x >= 1 && x <= n)
+    {
+        cout << "? " << x << endl;
+        fflush(stdout);
+        cin >> a[x];
+    }
+}
 int main()
 {
     FastIO;
-    
+    cin >> n;
+    a[0] = a[n + 1] = n + 1000;
+    int L = 1, R = n;
+    while (L < R)
+    {
+        int mid = (L + R) / 2;
+        find(mid);
+        find(mid + 1);
+        if (a[mid] < a[mid + 1])
+            R = mid;
+        else
+            L = mid + 1;
+    }
+    cout << "! " << R << endl;
+    fflush(stdout);
     return 0;
 }
