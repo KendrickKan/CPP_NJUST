@@ -50,6 +50,16 @@ void Sift_down(int i)
             down = true;
     }
 }
+void Heap_Insert(int x)
+{
+    n += 1;
+    heap[n] = x;
+    Sift_up(n);
+}
+void Heap_Delete(int i)
+{
+    
+}
 int main()
 {
 }
