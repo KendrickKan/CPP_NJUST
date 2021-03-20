@@ -39,7 +39,7 @@ void Sift_down(int i)
         i = 2 * i;
         if (i + 1 <= n && heap[i + 1] > heap[i])
             i = i + 1;
-        int tempson = (int)floor(i * 1.0 / 2);
+        int tempson = (int)floor(i * 1.0 / 2);//子节点
         if (heap[tempson] < heap[i])
         {
             int temp = heap[tempson];
