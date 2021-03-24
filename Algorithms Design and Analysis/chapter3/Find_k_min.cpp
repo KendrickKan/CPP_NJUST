@@ -7,36 +7,37 @@
  */
 #include <bits/stdc++.h>
 using namespace std;
-const int MAXN = 10005;
+#define FastIO ios_base::sync_with_stdio(false), cin.tie(NULL), cout.tie(NULL)
+const int MAXN = 5000005;
 int n, k;
-vector<int> vec;
+vector<int> tvec;
 bool cmp(int a, int b)
 {
     return a < b;
 }
-void select(vector<int> &vec, int k)
+void select(vector<int> vec, int k)
 {
     int p = vec.size();
-    // if (p < 44)
-    // {
-    //     sort(vec.begin(), vec.end(), cmp);
-    //     cout << vec[k - 1];
-    //     return;
-    // }
+    if (p < 44)
+    {
+        sort(vec.begin(), vec.end(), cmp);
+        cout << vec[k - 1];
+        return;
+    }
     int num = p / 5;
     vector<int> M;
-    for (int i = 0; i < p; i++)
+    for (int i = 0; i < num; i++)
     {
         vector<int> temp;
         for (int j = 0; j < 5; j++)
         {
-            temp.push_back(i * 5 + j);
+            temp.push_back(vec[i * 5 + j]);
         }
         sort(temp.begin(), temp.end(), cmp);
         M.push_back(temp[2]);
     }
     sort(M.begin(), M.end(), cmp);
-    int mm = M[(int)ceil(p * 1.0 / 2)];
+    int mm = M[(int)floor(num * 1.0 / 2)];
     vector<int> A1;
     vector<int> A2;
     vector<int> A3;
@@ -61,13 +62,14 @@ void select(vector<int> &vec, int k)
 }
 int main()
 {
+    FastIO;
     cin >> n >> k;
     for (int i = 0; i < n; i++)
     {
         int x;
         cin >> x;
-        vec.push_back(x);
+        tvec.push_back(x);
     }
-    select(vec, k);
+    select(tvec, k);
     return 0;
 }
