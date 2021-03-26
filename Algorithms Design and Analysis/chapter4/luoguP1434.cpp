@@ -36,9 +36,23 @@ void read(T &t)
 typedef long long ll;
 typedef pair<int, int> pii;
 typedef pair<ll, ll> pll;
+int r, c;
+const int MAXN = 105;
+int snow[MAXN][MAXN];
+int dp[MAXN][MAXN];
 int main()
 {
     FastIO;
-    
+    read(r);
+    read(c);
+    rep(i, 0, r)
+    {
+        rep(j, 0, c)
+        {
+            int x;
+            read(x);
+            snow[i][j] = x;
+        }
+    }
     return 0;
 }
