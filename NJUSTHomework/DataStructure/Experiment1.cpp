@@ -8,9 +8,10 @@ struct node
 };
 node *add(node *a, node *b)
 {
+once:
     node *head = a->exp <= b->exp ? a : b; //如果a的首项的指数大于等于b那么头节点弄为a，否则为b
     node *ha = a->exp <= b->exp ? a : b;
-    node *pa = ha->next;
+    node *pa = ha;
     node *pb = a->exp <= b->exp ? b : a;
     while (pa != NULL && pb != NULL)
     {
@@ -33,14 +34,27 @@ node *add(node *a, node *b)
             //相加为0
             else
             {
-                if (head == pa)
+                if (head == ha)
                 {
+
                     //如果两个多项式的第一项相加为0，那么就可能会更换head
-                    head = pa->next->exp <= pb->next->exp ? pa->next : pb->next;
-                    node *tempa = pa->next->exp <= pb->next->exp ? pa->next : pb->next;
-                    node *tempb = pa->next->exp <= pb->next->exp ? pb->next : pa->next;
-                    pa = tempa;
-                    pb = tempb;
+                    node *tempdela = pa;
+                    node *tempdelb = pb;
+                    a->next = pa->next;
+                    b->next = pb->next;
+                    delete tempdela;
+                    delete tempdelb;
+                    goto once;//重新返回入口
+                    // if (pa->next != NULL && pb->next != NULL)
+                    // {
+                    //     head = pa->next->exp <= pb->next->exp ? pa->next : pb->next;
+                    //     node *tempa = pa->next->exp <= pb->next->exp ? pa->next : pb->next;
+                    //     node *tempb = pa->next->exp <= pb->next->exp ? pb->next : pa->next;
+                    //     pa = tempa;
+                    //     pb = tempb;
+                    // }
+                    // else
+                    //     return pa->next == NULL ? pb->next : pa->next;
                 }
                 ha->next = pa->next;
                 node *temp = pa;
@@ -62,15 +76,17 @@ node *add(node *a, node *b)
     }
     if (pb != NULL)
     {
-        pa->next = pb;
+        if (pa != NULL)
+            pa->next = pb;
     }
-    return head;
+    return a;
 }
 void print(node *p) //打印多项式
 {
     // cout << p->coefficient << "x^" << p->exp;
     // if (p->next != NULL)
     //     cout << (p->next->coefficient > 0 ? "+" : "-");
+    p = p->next; //哨兵
     if (p == NULL)
     {
         cout << 0 << endl;
@@ -97,10 +113,14 @@ int main()
     cout << "请输入多项式二的项数>>>";
     cin >> bnum;
     cout << endl;
-    node *a = NULL;
-    node *nowa = NULL;
-    node *b = NULL;
-    node *nowb = NULL;
+    node *shaobinga = new node;
+    shaobinga->next = NULL;
+    node *shaobingb = new node;
+    shaobingb->next = NULL;
+    node *a = shaobinga;
+    node *nowa = shaobinga;
+    node *b = shaobingb;
+    node *nowb = shaobingb;
     cout << "请依次输入多项式一的系数，指数，请按照指数升序排列" << endl;
     for (int i = 0; i < anum; i++)
     {
@@ -115,16 +135,16 @@ int main()
         temp->coefficient = tempcoe;
         temp->exp = tempexp;
         temp->next = NULL;
-        if (i == 0)
-        {
-            a = temp;
-            nowa = a;
-        }
-        else
-        {
-            nowa->next = temp;
-            nowa = temp;
-        }
+        // if (i == 0)
+        // {
+        //     a = temp;
+        //     nowa = a;
+        // }
+        // else
+        // {
+        nowa->next = temp;
+        nowa = temp;
+        // }
     }
     cout << "请依次输入多项式二的系数，指数，请按照指数升序排列" << endl;
     for (int i = 0; i < bnum; i++)
@@ -140,16 +160,16 @@ int main()
         temp->coefficient = tempcoe;
         temp->exp = tempexp;
         temp->next = NULL;
-        if (i == 0)
-        {
-            b = temp;
-            nowb = b;
-        }
-        else
-        {
-            nowb->next = temp;
-            nowb = temp;
-        }
+        // if (i == 0)
+        // {
+        //     b = temp;
+        //     nowb = b;
+        // }
+        // else
+        // {
+        nowb->next = temp;
+        nowb = temp;
+        // }
     }
     cout << "多项式一为:" << endl;
     print(a);
