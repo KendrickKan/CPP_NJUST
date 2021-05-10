@@ -76,8 +76,8 @@ once:
     }
     if (pb != NULL)
     {
-        if (pa != NULL)
-            pa->next = pb;
+        if (ha != NULL)
+            ha->next = pb;
     }
     return a;
 }
