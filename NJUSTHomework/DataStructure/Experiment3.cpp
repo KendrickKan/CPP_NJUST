@@ -4,6 +4,11 @@ const int MAXN = 100;
 const int MAXEDGE = 1e9 + 7;
 //邻接矩阵实现图
 //该图是一个无向图
+struct Edge
+{
+    int u, v;
+    int weight;
+};
 struct Graph
 {
     int e[MAXN][MAXN];
@@ -11,7 +16,13 @@ struct Graph
     int ves;
     int DFSflag[MAXN];
     int BFSflag[MAXN];
+    vector<Edge> edge; //kruskal用
 };
+int father[MAXN]; //kruskal并查集用
+bool cmp(Edge a, Edge b)
+{
+    return a.weight < b.weight;
+}
 Graph *createGraph(Graph *G)
 {
     int vi;
@@ -38,10 +49,15 @@ Graph *createGraph(Graph *G)
     for (int i = 0; i < G->edges; i++)
     {
         cin >> vi >> vj;
-        int len;
-        cin >> len;
-        G->e[vi][vj] = len;
-        G->e[vj][vi] = len;
+        int weight;
+        cin >> weight;
+        G->e[vi][vj] = weight;
+        G->e[vj][vi] = weight;
+        Edge tempEdge;
+        tempEdge.u = vi;
+        tempEdge.v = vj;
+        tempEdge.weight = weight;
+        G->edge.push_back(tempEdge);
     }
     return G;
 }
@@ -142,11 +158,53 @@ void Prim(Graph *G)
         }
     }
     //理论来说vec.size()应该为G->ves-1
+    if (vec.size() != G->ves - 1)
+    {
+        cout << "该图不连通" << endl;
+        return;
+    }
     cout << "Prim算法加入的边为:" << endl;
     for (int i = 0; i < vec.size(); i++)
     {
         cout << vec[i].first << " " << vec[i].second << endl;
     }
+    return;
+}
+int findfather(int a) //并查集判断是否存在环
+{
+    while (a != father[a])
+    {
+        a = father[a];
+    }
+    return a;
+}
+void Kruskal(Graph *G)
+{
+    vector<pair<int, int>> ans;
+    sort(G->edge.begin(), G->edge.end(), cmp); //将边集合排序
+    for (int i = 0; i < G->ves; i++)
+        father[i] = i;
+    for (int i = 0; i < G->edge.size() && ans.size() < G->ves - 1; i++)
+    {
+        int u = G->edge[i].u;
+        int v = G->edge[i].v;
+        if (findfather(u) != findfather(v)) //判断父节点是否相同
+        {
+            ans.push_back(make_pair(u, v));
+            father[findfather(u)] = father[findfather(v)]; //将两点并入一个集合中
+        }
+    }
+    if (ans.size() != G->ves - 1)
+    {
+        cout << "该图不连通" << endl;
+        return;
+    }
+    cout << "Kruskal算法加入的边为:" << endl;
+    for (int i = 0; i < ans.size(); i++)
+    {
+        cout << ans[i].first << " " << ans[i].second << endl;
+    }
+    return;
 }
 int main()
 {
@@ -161,6 +219,7 @@ int main()
         bfs(G, i);
     cout << endl;
     Prim(G);
+    Kruskal(G);
     delete G;
     return 0;
 }
