@@ -1,6 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 const int MAXN = 100;
+const int MAXEDGE = 1e9 + 7;
 //邻接矩阵实现图
 //该图是一个无向图
 struct Graph
@@ -27,18 +28,20 @@ Graph *createGraph(Graph *G)
     {
         for (int j = 0; j < G->ves; j++)
         {
-            G->e[i][j] = 0;
+            G->e[i][j] = MAXEDGE;
         }
         G->DFSflag[i] = 0; //标识全部置0,表示没有访问过结点
         G->BFSflag[i] = 0;
     }
     //创建邻接矩阵
-    cout << "请输入边 edges(vi,vj) 注意！！！顶点是从0到VES-1" << endl;
+    cout << "请输入边 edges(vi,vj) 以及该边长度 注意！！！顶点是从0到VES-1" << endl;
     for (int i = 0; i < G->edges; i++)
     {
         cin >> vi >> vj;
-        G->e[vi][vj] = 1;
-        G->e[vj][vi] = 1;
+        int len;
+        cin >> len;
+        G->e[vi][vj] = len;
+        G->e[vj][vi] = len;
     }
     return G;
 }
@@ -60,7 +63,7 @@ void dfs(Graph *G, int ves)
         nowNode = sta.top();
         for (i = 0; i < G->ves; i++)
         {
-            if (G->e[nowNode][i] != 0 && G->DFSflag[i] != 1)
+            if (G->e[nowNode][i] < MAXEDGE && G->DFSflag[i] != 1)
             {
                 cout << i << " ";
                 G->DFSflag[i] = 1;
@@ -89,7 +92,7 @@ void bfs(Graph *G, int ves)
         Q.pop();
         for (int i = 0; i < G->ves; i++)
         {
-            if (G->e[nowNode][i] != 0 && G->BFSflag[i] != 1)
+            if (G->e[nowNode][i] < MAXEDGE && G->BFSflag[i] != 1)
             {
                 cout << i << " ";
                 Q.push(i);
@@ -98,6 +101,52 @@ void bfs(Graph *G, int ves)
         }
     }
     return;
+}
+void Prim(Graph *G)
+{
+    int start = 0; //开始节点,默认为0
+    bool visited[MAXN];
+    for (int i = 0; i < G->ves; i++)
+        visited[i] = false;
+    visited[start] = true;
+    int Min[2][MAXN]; //第一行记录目前集合中哪个点到剩余每个点距离最少，第二行记录目前集合中点到剩余每个点最少的距离
+    for (int i = 0; i < G->ves; i++)
+    {
+        Min[0][i] = start;
+        Min[1][i] = G->e[start][i];
+    }
+    vector<pair<int, int>> vec;
+    for (int i = 0; i < G->ves; i++)
+    {
+        if (i == start)
+            continue;
+        int minedge = MAXEDGE;
+        int node;
+        for (int i = 0; i < G->ves; i++)
+        {
+            if (!visited[i] && Min[1][i] < minedge)
+            {
+                minedge = Min[1][i];
+                node = i;
+            }
+        }
+        vec.push_back(make_pair(Min[0][node], node)); //记录生成树
+        visited[node] = true;
+        for (int i = 0; i < G->ves; ++i)
+        {
+            if (!visited[i] && Min[1][i] > G->e[node][i])
+            {
+                Min[1][i] = G->e[node][i];
+                Min[0][i] = node;
+            }
+        }
+    }
+    //理论来说vec.size()应该为G->ves-1
+    cout << "Prim算法加入的边为:" << endl;
+    for (int i = 0; i < vec.size(); i++)
+    {
+        cout << vec[i].first << " " << vec[i].second << endl;
+    }
 }
 int main()
 {
@@ -111,6 +160,23 @@ int main()
     for (int i = 0; i < G->ves; i++) //遍历整个图，可能不是连通图
         bfs(G, i);
     cout << endl;
+    Prim(G);
     delete G;
     return 0;
 }
+
+//给出一组数据
+/*
+6
+10
+0 1 6
+0 3 5
+0 2 1
+1 2 5
+2 3 5
+1 4 3
+2 4 6
+2 5 4
+3 5 2
+4 5 6
+*/
