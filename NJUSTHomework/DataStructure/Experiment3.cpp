@@ -16,9 +16,9 @@ struct Graph
     int ves;
     int DFSflag[MAXN];
     int BFSflag[MAXN];
-    vector<Edge> edge; //kruskal用
+    vector<Edge> edge; //Kruskal用
 };
-int father[MAXN]; //kruskal并查集用
+int father[MAXN]; //Kruskal并查集用
 bool cmp(Edge a, Edge b)
 {
     return a.weight < b.weight;
