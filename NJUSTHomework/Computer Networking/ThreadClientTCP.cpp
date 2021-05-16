@@ -34,8 +34,8 @@ void new_client(int pos)
 	SOCKADDR_IN Server;//义存放本地地址信息的结构体变量
 
 	// 要连接的基础信息
-	Server.sin_family = AF_INET//sin_family指代协议族，其值一般是AF_INET表示采用IPv4协议
-	Server.sin_port = htons(6002);)//将端口号6002赋给sin_port 
+	Server.sin_family = AF_INET;  //sin_family指代协议族，其值一般是AF_INET表示采用IPv4协议
+	Server.sin_port = htons(6002);//将端口号6002赋给sin_port 
 	inet_pton(AF_INET, "127.0.0.1", &Server.sin_addr); //点分十进制地址转换成网络字节序
 
 	// 向服务端发起连接
