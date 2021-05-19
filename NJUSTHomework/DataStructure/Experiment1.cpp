@@ -9,7 +9,7 @@ struct node
 node *add(node *a, node *b)
 {
 once:
-    node *head = a->exp <= b->exp ? a : b; //如果a的首项的指数大于等于b那么头节点弄为a，否则为b
+    node *head = a->exp <= b->exp ? a : b; //如果a的首项的指数小于等于b那么头节点弄为a，否则为b
     node *ha = a->exp <= b->exp ? a : b;
     node *pa = ha;
     node *pb = a->exp <= b->exp ? b : a;
