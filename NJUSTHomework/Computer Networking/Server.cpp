@@ -27,7 +27,7 @@ int main(int argc, char **argv)
 	}
 
 	nPort = atoi(argv[1]);
-
+	//nPort=port;
 	//
 	// Initialize WinSock and check version
 	//
@@ -146,7 +146,12 @@ void StreamServer(short nPort)
 	//
 	// Receive data from the client
 	//
+	while(true)
+	{
 	memset(szBuf, 0, sizeof(szBuf));//szBuf清0 
+	//printf("\n");
+	//scanf("%s",&szBuf);
+	//printf("%s",szBuf);
 	nRet = recv(remoteSocket,					// Connected client，从客户端接受数据 
 				szBuf,							// Receive buffer
 				sizeof(szBuf),					// Lenght of buffer
@@ -167,12 +172,16 @@ void StreamServer(short nPort)
 	//
 	// Send data back to the client
 	//
-	strcpy(szBuf, "From the Server");//复制消息进入buf 
+	printf("\nPlease input send message:");
+	printf("\n");
+	memset(szBuf, 0, sizeof(szBuf));
+	scanf("%s",&szBuf);
+	//strcat(szBuf, "From the Server");//复制消息进入buf 
 	nRet = send(remoteSocket,				// Connected socket，向客户端发送数据 
 				szBuf,						// Data buffer
 				strlen(szBuf),				// Lenght of data
 				0);							// Flags
-
+	}
 	//
 	// Close BOTH sockets before exiting
 	//

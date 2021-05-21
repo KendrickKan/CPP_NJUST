@@ -26,8 +26,13 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
+//	char* laptopname;
+//	scanf("%s",&laptopname);
+//	int port;
+//	scanf("%d",&port);
+	
 	nPort = atoi(argv[2]);
-
+	//nPort = port;
 
 	//
 	// Initialize WinSock and check the version
@@ -44,7 +49,7 @@ int main(int argc, char **argv)
 	// Go do the stuff a stream client does
 	//
 	StreamClient(argv[1], nPort);
-	
+	//StreamClient(laptopname, nPort);
 	//
 	// Release WinSock
 	//
@@ -112,9 +117,15 @@ void StreamClient(char *szServer, short nPort)
 	//
 	// Send data to the server
 	//
+	while(true){
 	char szBuf[256];
-
-	strcpy(szBuf, "From the Client");//复制消息进入buf 
+	memset(szBuf, 0, sizeof(szBuf));
+	printf("\nPlease input send message:");
+	printf("\n");
+	scanf("%s",&szBuf);
+	//gets_s(szBuf);
+	//printf("%s",szBuf);
+	//strcat(szBuf, "From the Client");//复制消息进入buf 
 	nRet = send(theSocket,				// Connected socket，向服务器发送数据 
 				szBuf,					// Data buffer
 				strlen(szBuf),			// Length of data
@@ -129,6 +140,7 @@ void StreamClient(char *szServer, short nPort)
 	//
 	// Wait for a reply
 	//
+	memset(szBuf, 0, sizeof(szBuf));
 	nRet = recv(theSocket,				// Connected socket，从服务器接收数据 
 				szBuf,					// Receive buffer
 				sizeof(szBuf),			// Size of receive buffer
@@ -144,7 +156,7 @@ void StreamClient(char *szServer, short nPort)
 	// Display the received data
 	//
 	printf("\nData received: %s", szBuf);//输出从服务器接收到缓冲区里的数据 
-
+	}
 
 	closesocket(theSocket);//结束套接口 
 	return;
