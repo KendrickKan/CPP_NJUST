@@ -1,10 +1,3 @@
-/*
- * @Author: KendrickKan 
- * @Date: 2021-03-24 14:22:56 
- * @Last Modified by: KendrickKan
- * @Last Modified time: 2021-03-24 15:00:47
- * @about：Find_k_min
- */
 #include <bits/stdc++.h>
 using namespace std;
 #define FastIO ios_base::sync_with_stdio(false), cin.tie(NULL), cout.tie(NULL)
@@ -52,9 +45,9 @@ void select(vector<int> vec, int k)
     }
     if (A1.size() >= k)
         select(A1, k);
-    else if (A1.size() + A2.size() >= k)
+    else if (A1.size() + A2.size() == k)
     {
-        cout << mm;
+        cout << mm <<endl;
         return;
     }
     else
