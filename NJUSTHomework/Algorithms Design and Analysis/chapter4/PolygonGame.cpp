@@ -23,29 +23,29 @@ int main()
         dpmin[i][0] = v[i];
         dpmax[i][0] = v[i];
     }
-    for (int i = 1; i <= N; i++)
+    for (int l = 1; l < N; l++)
     {
-        for (int l = 1; l <= N; l++)
+        for (int i = 1; i <= N; i++)
         {
             dpmin[i][l] = 1e9 + 7;
             dpmax[i][l] = -1e9 + 7;
-            for (int t = 0; t <= l; t++)
+            for (int t = 0; t < l; t++)
             {
-                if (op[(i + (t - 1)) % (N + 1)] == '+')
-                    dpmin[i][l] = min(dpmin[i][t] + dpmin[(i + t) % (N + 1)][l - t - 1], dpmin[i][l]);
+                if (op[(i + t) % N + 1] == '+')
+                    dpmin[i][l] = min(dpmin[i][t] + dpmin[(i + t) % N + 1][l - t - 1], dpmin[i][l]);
                 else
-                    dpmin[i][l] = kmin(dpmin[i][t] * dpmin[(i + t) % (N + 1)][l - t - 1],
-                                       dpmin[i][t] * dpmax[(i + t) % (N + 1)][l - t - 1],
-                                       dpmax[i][t] * dpmin[(i + t) % (N + 1)][l - t - 1],
-                                       dpmax[i][t] * dpmax[(i + t) % (N + 1)][l - t - 1],
+                    dpmin[i][l] = kmin(dpmin[i][t] * dpmin[(i + t) % N + 1][l - t - 1],
+                                       dpmin[i][t] * dpmax[(i + t) % N + 1][l - t - 1],
+                                       dpmax[i][t] * dpmin[(i + t) % N + 1][l - t - 1],
+                                       dpmax[i][t] * dpmax[(i + t) % N + 1][l - t - 1],
                                        dpmin[i][l]);
-                if (op[(i + (t - 1)) % (N + 1)] == '+')
-                    dpmax[i][l] = max(dpmax[i][t] + dpmax[(i + t) % (N + 1)][l - t - 1], dpmax[i][l]);
+                if (op[(i + t) % N + 1] == '+')
+                    dpmax[i][l] = max(dpmax[i][t] + dpmax[(i + t) % N + 1][l - t - 1], dpmax[i][l]);
                 else
-                    dpmax[i][l] = kmax(dpmin[i][t] * dpmin[(i + t) % (N + 1)][l - t - 1],
-                                       dpmin[i][t] * dpmax[(i + t) % (N + 1)][l - t - 1],
-                                       dpmax[i][t] * dpmin[(i + t) % (N + 1)][l - t - 1],
-                                       dpmax[i][t] * dpmax[(i + t) % (N + 1)][l - t - 1],
+                    dpmax[i][l] = kmax(dpmin[i][t] * dpmin[(i + t) % N + 1][l - t - 1],
+                                       dpmin[i][t] * dpmax[(i + t) % N + 1][l - t - 1],
+                                       dpmax[i][t] * dpmin[(i + t) % N + 1][l - t - 1],
+                                       dpmax[i][t] * dpmax[(i + t) % N + 1][l - t - 1],
                                        dpmax[i][l]);
             }
         }
