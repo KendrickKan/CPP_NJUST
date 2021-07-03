@@ -50,7 +50,12 @@ int main()
             }
         }
     }
+    int maxanswer = -1e9 + 7;
     for (int i = 1; i <= N; i++)
-        cout << dpmax[i][N - 1] << " ";
+        maxanswer = max(maxanswer, dpmax[i][N - 1]);
+    cout << maxanswer << endl;
+    for (int i = 1; i <= N; i++)
+        if (dpmax[i][N - 1] == maxanswer)
+            cout << i << " ";
     return 0;
 }
