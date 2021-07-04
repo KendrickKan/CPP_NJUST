@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
-const int MAXN = 5;
+const int MAXN = 10005;
 int N;
 int v[MAXN];
 char op[MAXN];
