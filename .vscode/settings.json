@@ -9,6 +9,7 @@
         "deque": "cpp",
         "string": "cpp",
         "vector": "cpp",
-        "type_traits": "cpp"
+        "type_traits": "cpp",
+        "regex": "cpp"
     }
 }
