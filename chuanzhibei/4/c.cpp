@@ -37,25 +37,41 @@ void read(T &t)
 typedef long long ll;
 typedef pair<int, int> pii;
 typedef pair<ll, ll> pll;
-int a[1005];
+vector<int> vec[102];
 int main()
 {
     FastIO;
-    int n;
-    cin >> n;
-    int max = 0;
-    int min = 1001;
-    rep(i, 0, n)
+    int n, k;
+    cin >> n >> k;
+    while (n--)
     {
-        cin >> a[i];
-        if (a[i] > max)
-            max = a[i];
-        if (a[i] < min)
-            min = a[i];
-    }
-    int x = max - min;
-    rep(i, 0, n){
-        cout << (a[i] - min) * 100 / x << " ";
+        int t;
+        cin >> t;
+        if (t == 1)
+        {
+            int p;
+            cin >> p;
+            while (p--)
+            {
+                int x, y;
+                cin >> x >> y;
+                vec[x].pb(y);
+            }
+        }
+        else
+        {
+            int x, y1, y2;
+            cin >> x >> y1 >> y2;
+            int num = 0;
+            for (int i = 0; i < vec[x].size(); i++)
+            {
+                if (vec[x][i] >= y1 && vec[x][i] <= y2)
+                {
+                    num++;
+                }
+            }
+            cout << num << endl;
+        }
     }
     return 0;
 }
