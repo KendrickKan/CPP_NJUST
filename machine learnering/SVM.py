@@ -165,9 +165,7 @@ def acc(train_x, train_y, test_x, test_y):
     #调用Tensor类的构造函数__init__，生成单精度浮点类型的张量
     #首先计算训练样本
     x = torch.Tensor(train_x)      # torch.FloatTensor 类型张量
-    print(x)
     y = torch.Tensor(train_y)
-    print(y)
     pred = model(x)               # 使用x创建ANN类
     pred = torch.argmax(pred, dim=-1)   #dim对应维度， argmax取得最大值的索引
     y = torch.argmax(y, dim=-1)
