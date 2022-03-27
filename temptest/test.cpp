@@ -40,6 +40,8 @@ typedef pair<ll, ll> pll;
 int main()
 {
     FastIO;
-
+    string str1 = "1000000000.mp4";
+    string str2 = "100000001.mp4";
+    cout << (str1 < str2) << endl;
     return 0;
 }

@@ -19,7 +19,7 @@ int main()
 		{
 			int ktemp = temp%10;
 			temp/=10;
-			if(a[ktemp]<=0)
+ 			if(a[ktemp]<=0)
 				goto stop;
 			else a[ktemp]--;
 		}

@@ -40,44 +40,30 @@ typedef pair<ll, ll> pll;
 int main()
 {
     FastIO;
-    int t;
-    cin >> t;
-    while (t--)
+    int k = 0;
+    int n;
+    cin >> k;
+    cin >> n;
+    int now;
+    rep(i, 0, n)
     {
-        int n;
-        cin >> n;
-        vector<int> a1, a2, b1, b2;
-        rep(i, 0, n)
+        if (k <= 50)
         {
-            int x;
-            cin >> x;
-            a1.pb(x);
-            a2.pb(x);
+            int m = k / 10;
+            k += m;
         }
-        rep(i, 0, n)
+        else
         {
-            int x;
-            cin >> x;
-            b1.pb(x);
-            b2.pb(x);
+            now = i;
+            k += 10;
+            break;
         }
-        sort(a1.begin(), a1.end());
-        sort(b1.begin(), b1.end());
-        bool flag = false;
-        rep(i, 0, n)
-        {
-            if (a1[i] != b1[i])
-            {
-                flag = true;
-                break;
-            }
-        }
-        if (flag)
-        {
-            cout << "NO" << endl;
-            continue;
-        }
-        cout << "YES" << endl;
+        k += 5;
     }
+    if (now < (n - 1))
+    {
+        k += 10 * (n - 1 - now);
+    }
+    cout << k << endl;
     return 0;
 }

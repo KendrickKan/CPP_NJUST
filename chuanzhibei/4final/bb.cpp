@@ -37,47 +37,40 @@ void read(T &t)
 typedef long long ll;
 typedef pair<int, int> pii;
 typedef pair<ll, ll> pll;
+int splitArray(vector<ll> &nums, int m)
+{
+    int n = nums.size();
+    vector<vector<long long>> f(n + 1, vector<long long>(m + 1, LLONG_MAX));
+    vector<long long> sub(n + 1, 0);
+    for (int i = 0; i < n; i++)
+    {
+        sub[i + 1] = sub[i] + nums[i];
+    }
+    f[0][0] = 0;
+    for (int i = 1; i <= n; i++)
+    {
+        for (int j = 1; j <= min(i, m); j++)
+        {
+            for (int k = 0; k < i; k++)
+            {
+                f[i][j] = min(f[i][j], max(f[k][j - 1], sub[i] - sub[k]));
+            }
+        }
+    }
+    return (int)f[n][m];
+}
 int main()
 {
     FastIO;
-    int t;
-    cin >> t;
-    while (t--)
+    int n, k;
+    cin >> n >> k;
+    vector<ll> vec;
+    rep(i, 0, n)
     {
-        int n;
-        cin >> n;
-        vector<int> a1, a2, b1, b2;
-        rep(i, 0, n)
-        {
-            int x;
-            cin >> x;
-            a1.pb(x);
-            a2.pb(x);
-        }
-        rep(i, 0, n)
-        {
-            int x;
-            cin >> x;
-            b1.pb(x);
-            b2.pb(x);
-        }
-        sort(a1.begin(), a1.end());
-        sort(b1.begin(), b1.end());
-        bool flag = false;
-        rep(i, 0, n)
-        {
-            if (a1[i] != b1[i])
-            {
-                flag = true;
-                break;
-            }
-        }
-        if (flag)
-        {
-            cout << "NO" << endl;
-            continue;
-        }
-        cout << "YES" << endl;
+        ll x;
+        cin >> x;
+        vec.push_back(x * x);
     }
+    cout << splitArray(vec, k);
     return 0;
 }

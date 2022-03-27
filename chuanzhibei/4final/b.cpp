@@ -37,47 +37,47 @@ void read(T &t)
 typedef long long ll;
 typedef pair<int, int> pii;
 typedef pair<ll, ll> pll;
+int a[100005];
+bool CHECK(int a[], int n, int k, int max_value)
+{
+    int cnt = 0, sum = 0;
+    for (int i = 0; i < n; ++i)
+    {
+        if (a[i] > max_value) 
+            return false;
+        sum += a[i];
+        if (sum > max_value)
+        {
+            cnt++;
+            sum = a[i];
+        }
+    }
+    cnt++;
+    return cnt <= k;
+}
+int BinarySearch(int a[], int n, int k)
+{
+    int low = 0, high = INT_MAX;
+    while (high > low)
+    {
+        int mid = (low + high) >> 1;
+        if (CHECK(a, n, k, mid))
+            high = mid;
+        else
+            low = mid + 1;
+    }
+    return high;
+}
 int main()
 {
     FastIO;
-    int t;
-    cin >> t;
-    while (t--)
+    int n, k;
+    cin >> n >> k;
+    rep(i, 0, n)
     {
-        int n;
-        cin >> n;
-        vector<int> a1, a2, b1, b2;
-        rep(i, 0, n)
-        {
-            int x;
-            cin >> x;
-            a1.pb(x);
-            a2.pb(x);
-        }
-        rep(i, 0, n)
-        {
-            int x;
-            cin >> x;
-            b1.pb(x);
-            b2.pb(x);
-        }
-        sort(a1.begin(), a1.end());
-        sort(b1.begin(), b1.end());
-        bool flag = false;
-        rep(i, 0, n)
-        {
-            if (a1[i] != b1[i])
-            {
-                flag = true;
-                break;
-            }
-        }
-        if (flag)
-        {
-            cout << "NO" << endl;
-            continue;
-        }
-        cout << "YES" << endl;
+        cin >> a[i];
+        a[i] = a[i] * a[i];
     }
+    cout << BinarySearch(a, n, k) << endl;
     return 0;
 }

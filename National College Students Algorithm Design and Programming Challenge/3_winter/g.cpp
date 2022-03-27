@@ -37,47 +37,43 @@ void read(T &t)
 typedef long long ll;
 typedef pair<int, int> pii;
 typedef pair<ll, ll> pll;
+int n;
+int num;
+int dfs(int x)
+{
+    if (num >= 50)
+        return 0;
+    if (x <= n)
+    {
+        num++;
+        cout << x << ".mp4" << endl;
+        if (num >= 50)
+            return 0;
+    }
+    if (num >= 50)
+        return 0;
+    if ((x * 10) <= n)
+    {
+        if (num >= 50)
+            return 0;
+        dfs(x * 10);
+        if (num >= 50)
+            return 0;
+    }
+    if (((x + 1) <= n) && ((x % 10 + 1) <= 9))
+    {
+        if (num >= 50)
+            return 0;
+        dfs(x + 1);
+        if (num >= 50)
+            return 0;
+    }
+    return 0;
+}
 int main()
 {
     FastIO;
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        int n;
-        cin >> n;
-        vector<int> a1, a2, b1, b2;
-        rep(i, 0, n)
-        {
-            int x;
-            cin >> x;
-            a1.pb(x);
-            a2.pb(x);
-        }
-        rep(i, 0, n)
-        {
-            int x;
-            cin >> x;
-            b1.pb(x);
-            b2.pb(x);
-        }
-        sort(a1.begin(), a1.end());
-        sort(b1.begin(), b1.end());
-        bool flag = false;
-        rep(i, 0, n)
-        {
-            if (a1[i] != b1[i])
-            {
-                flag = true;
-                break;
-            }
-        }
-        if (flag)
-        {
-            cout << "NO" << endl;
-            continue;
-        }
-        cout << "YES" << endl;
-    }
+    cin >> n;
+    dfs(1);
     return 0;
 }
