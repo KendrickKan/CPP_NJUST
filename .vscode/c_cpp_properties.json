@@ -18,7 +18,6 @@
                 "__GNUC__=6",
                 "__cdecl=__attribute__((__cdecl__))"
             ],
-            //"intelliSenseMode": "msvc-x64",
             "intelliSenseMode": "windows-gcc-x64",
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
@@ -33,7 +32,8 @@
                     "D:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include-fixed",
                     "D:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/../../../../x86_64-w64-mingw32/include"
                 ]
-            }
+            },
+            "compilerPath": "D:/mingw64/bin/g++.exe"
         }
     ],
     "version": 4
