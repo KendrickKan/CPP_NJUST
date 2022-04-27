@@ -13,7 +13,7 @@ using namespace std;
 #define se second
 #define EPS 1e-10
 const int MOD = 1e9 + 7;
-//INT_MAX <limits>
+// INT_MAX <limits>
 #define PI acos(-1)
 template <typename T>
 void read(T &t)
@@ -40,8 +40,12 @@ typedef pair<ll, ll> pll;
 int main()
 {
     FastIO;
-    string str1 = "1000000000.mp4";
-    string str2 = "100000001.mp4";
-    cout << (str1 < str2) << endl;
+    string str1 = "KD is a PIG!";
+    string str2 = "JZW HATE KD!!!!";
+    while (0)
+    {
+        cout << str1 << " " << str2 << endl;
+    }
+    // cout << (str1 < str2) << endl;
     return 0;
 }
