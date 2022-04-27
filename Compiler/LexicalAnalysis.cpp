@@ -33,7 +33,7 @@ NFA kNFA;
 //用@代表空
 struct Closure
 {
-    vector<string> cSet; //需要将其升序排序，以方便比对是否存在
+    vector<char> cSet; //需要将其升序排序，以方便比对是否存在
 };
 vector<Closure> Closures; //子集集合
 bool isInteger(char a);
@@ -47,7 +47,8 @@ bool is_in_NFAInput(string str); //判断该输入字母是否存在于NFA中
 void initNFA();
 bool CreateNFA();
 void ShowNFA();
-void get_closure();
+bool is_in_closure(char a); //判断该元素是否在子集
+Closure get_closure();
 void NFA_to_DFA();
 int main()
 {
@@ -199,13 +200,35 @@ void ShowNFA()
         cout << endl;
     }
 }
-void get_closure(Closure c)
+bool is_in_closure(char a, Closure c)
 {
-    // for (int i = 0; i < c.cSet.size(); i++)
-    // {
-    //     for()
-    // }
+    for (int i = 0; i < c.cSet.size(); i++)
+    {
+        if (a == c.cSet[i])
+            return true;
+    }
+    return false;
+}
+Closure get_closure(Closure c)
+{
+    //这里的c.size()是动态变化的
+    for (int i = 0; i < c.cSet.size(); i++)
+    {
+        for (int j = 0; j < kNFA.NFAMove[c.cSet[i] - 0]['@' - 0].num; j++)
+        {
+            char temp = kNFA.NFAMove[c.cSet[i] - 0]['@' - 0].NFA_Point_State[j]; //从该状态经过空弧走到temp
+            if (!is_in_closure(temp))
+            {
+                c.cSet.push_back(temp);
+            }
+        }
+    }
+    return c; //加入子集 集合
 }
 void NFA_to_DFA()
 {
+    Closure cbegin;
+    cbegin.cSet.push_back('S'); //初态 这里是定死了的
+    cbegin = get_closure(cbegin);//得到第一个子集
+    Closures.push_back(cbegin);
 }
