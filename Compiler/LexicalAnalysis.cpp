@@ -36,6 +36,11 @@ struct Closure
     vector<char> cSet; //需要将其升序排序，以方便比对是否存在
 };
 vector<Closure> Closures; //子集集合
+struct DFA
+{
+    pair<char,int> DFAMove[200][200];//第一个char代表的是状态内容，第二个int代表的是不是终态
+};
+DFA kDFA;
 bool isInteger(char a);
 bool isLetter(char a);
 bool isKeyword(string a);
@@ -228,7 +233,10 @@ Closure get_closure(Closure c)
 void NFA_to_DFA()
 {
     Closure cbegin;
-    cbegin.cSet.push_back('S'); //初态 这里是定死了的
-    cbegin = get_closure(cbegin);//得到第一个子集
+    cbegin.cSet.push_back('S');   //初态 这里是定死了的 //但是后期可以改
+    cbegin = get_closure(cbegin); //得到第一个子集
     Closures.push_back(cbegin);
+    for (int i = 0; i < Closures.size(); i++)
+    {
+    }
 }
