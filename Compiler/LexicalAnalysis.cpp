@@ -76,6 +76,7 @@ int main()
         cout << endl;
     }
     ShowDFA();
+    slove();
     // cout << 'a' - 0;
     return 0;
 }
@@ -150,7 +151,7 @@ bool is_in_NFAInput(string str)
 }
 bool CreateNFA()
 {
-    ifstream fs("LexicalAnalysis.txt");
+    ifstream fs("LexicalAnalysisOLD.txt");
     if (fs.is_open())
     {
         bool fbegin = false;
@@ -351,4 +352,80 @@ bool DFA(string str)
 }
 void slove()
 {
+    cout << "\n       内容      类别    行号\n";
+
+    ifstream fs("LexicalAnalysisSourceProgram.txt");
+    if (fs.is_open())
+    {
+        string line;
+        int lineNum = 0; //代码所在行数
+        while (getline(fs, line))
+        {
+            lineNum++;
+            for (int i = 0; i < line.length();)
+            {
+                string checkStr = "";
+                if (isInteger(line[i]))
+                {
+                    checkStr += line[i];
+                    i++;
+                    while (isInteger(line[i]) || isLetter(line[i]) || line[i] == '.' || line[i] == '+' || line[i] == '-')
+                    {
+                        checkStr += line[i];
+                        i++;
+                    }
+                    if (DFA(checkStr))
+                    {
+                        cout << left << setw(15) << checkStr << " 常量      " << lineNum << endl;
+                    }
+                    else
+                    {
+                        cout << left << setw(15) << checkStr << " 非法常量   " << lineNum << endl;
+                    }
+                }
+                else if (isLetter(line[i]))
+                {
+                    checkStr += line[i];
+                    i++;
+                    while (isLetter(line[i]) || isInteger(line[i]))
+                    {
+                        checkStr += line[i];
+                        i++;
+                    }
+                    if (isKeyword(checkStr))
+                    {
+                        cout << left << setw(15) << checkStr << " 关键字    " << lineNum << endl;
+                    }
+                    else
+                    {
+                        if (DFA(checkStr))
+                        {
+                            if (DFA(checkStr))
+                            {
+                                cout << left << setw(15) << checkStr << " 标识符    " << lineNum << endl;
+                            }
+                            else
+                            {
+                                cout << left << setw(15) << checkStr << " 非法标识符  " << lineNum << endl;
+                            }
+                        }
+                    }
+                }
+                checkStr = line[i]; //这样能将char转化为string
+                if (isDelimiter(checkStr))
+                {
+                    i++;
+                    cout << left << setw(15) << checkStr << " 限定符    " << lineNum << endl;
+                }
+                else if (isMonocularOperator(checkStr))
+                {
+                    i++;
+                    cout << left << setw(15) << checkStr << " 运算符    " << lineNum << endl;
+                }
+                if (line[i] == ' ' || line[i] == '\n' || line[i] == '\t')
+                    i++;
+            }
+        }
+        fs.close();
+    }
 }
