@@ -15,6 +15,7 @@ int BinocularOperators_Number = BinocularOperators.size();                      
 int Delimiters_Number = Delimiters.size();
 // NFA当输入一个的时候，所转向的是不确定的
 //所以将NFA的每一个状态所转向的状态当作一个结构
+char beginch;
 struct NFA_Point
 {
     vector<char> NFA_Point_State;
@@ -33,15 +34,11 @@ NFA kNFA;
 //用@代表空
 struct Closure
 {
-    vector<char> cSet; //需要将其升序排序，以方便比对是否存在
-    bool haveOver;     //用于判断是否含有终态
+    vector<char> cSet;   //需要将其升序排序，以方便比对是否存在
+    bool haveOver;       //用于判断是否含有终态
+    int dfa[200] = {-1}; //下标就是输入的ASCAII的值，存的就是clousers的下标
 };
 vector<Closure> clousers; //子集集合
-struct DFA
-{
-    pair<char, int> DFAMove[200][200]; //第一个char代表的是状态内容，第二个int代表的是不是终态
-};
-DFA kDFA;
 bool isInteger(char a);
 bool isLetter(char a);
 bool isKeyword(string a);
@@ -50,17 +47,18 @@ bool isBinocularOperator(string a);
 bool isDelimiter(string a);
 bool is_in_NFAState(string str); //判断该状态是否存在于NFA中
 bool is_in_NFAInput(string str); //判断该输入字母是否存在于NFA中
-void initNFA();
 bool CreateNFA();
 void ShowNFA();
 bool is_in_closure(char a, Closure c); //判断该元素是否在子集
 Closure get_closure(Closure c);
-bool is_in_closures(Closure c);
+int is_in_closures(Closure c);
 Closure colouse_move(Closure c, char ch);
 void NFA_to_DFA();
+void ShowDFA();
+bool DFA(string str);
+void slove();
 int main()
 {
-    // initNFA();
     if (!CreateNFA())
     {
         cout << "Error:构建NFA失败";
@@ -69,6 +67,7 @@ int main()
     NFA_to_DFA();
     for (int i = 0; i < clousers.size(); i++)
     {
+        cout << "T_Index:" << i << " ";
         for (int j = 0; j < clousers[i].cSet.size(); j++)
         {
             cout << clousers[i].cSet[j] << " ";
@@ -76,7 +75,8 @@ int main()
         cout << clousers[i].haveOver;
         cout << endl;
     }
-    //   cout << 'a' - 0;
+    ShowDFA();
+    // cout << 'a' - 0;
     return 0;
 }
 bool isInteger(char a)
@@ -148,24 +148,12 @@ bool is_in_NFAInput(string str)
     }
     return false;
 }
-// void initNFA()
-// {
-//     for (int i = 0; i < 200; i++)
-//     {
-//         for (int j = 0; j < 200; j++)
-//         {
-//             for (int k = 0; k < 200; k++)
-//             {
-//                 kNFA.NFAMove[i][j].NFA_Point_State[k] = '#';
-//             }
-//         }
-//     }
-// }
 bool CreateNFA()
 {
     ifstream fs("LexicalAnalysis.txt");
     if (fs.is_open())
     {
+        bool fbegin = false;
         // cout << "YES";
         string line;
         while (getline(fs, line))
@@ -178,6 +166,11 @@ bool CreateNFA()
             // cout << strL << "" << strR << endl;
             if (!is_in_NFAState(strL)) //如果状态不存在，那就把它放进去
             {
+                if (!fbegin)
+                {
+                    beginch = ch1;
+                    fbegin = true;
+                }
                 kNFA.NFAState.push_back(strL);
             }
             string strR0;
@@ -248,7 +241,7 @@ Closure get_closure(Closure c)
     }
     return c; //加入子集 集合
 }
-bool is_in_closures(Closure c)
+int is_in_closures(Closure c)
 {
     for (int i = 0; i < clousers.size(); i++)
     {
@@ -265,10 +258,10 @@ bool is_in_closures(Closure c)
                 }
             }
             if (!flag)
-                return true;
+                return i;
         }
     }
-    return false;
+    return -1;
 }
 Closure colouse_move(Closure c, char ch)
 {
@@ -299,8 +292,8 @@ Closure chaveOver(Closure c)
 void NFA_to_DFA()
 {
     Closure cbegin;
-    cbegin.cSet.push_back('S');   //初态 这里是定死了的 //但是后期可以改
-    cbegin = get_closure(cbegin); //得到第一个子集
+    cbegin.cSet.push_back(beginch); //初态 这里是定死了的 //但是后期可以改
+    cbegin = get_closure(cbegin);   //得到第一个子集
     cbegin.haveOver = false;
     sort(cbegin.cSet.begin(), cbegin.cSet.end()); //排序，方便比对
     cbegin = chaveOver(cbegin);                   //判断是否含有终结
@@ -309,16 +302,53 @@ void NFA_to_DFA()
     {
         for (int j = 0; j < kNFA.NFAInput.size(); j++)
         {
-            if (kNFA.NFAInput[j][0] == '@')
+            char tempch = kNFA.NFAInput[j][0];
+            if (kNFA.NFAInput[j][0] == '@') //这里的kNFA.NFAInput[j]其实是含有一个字符的字符串，所以只需要提起第一个就行啦
                 continue;
-            Closure temp = colouse_move(clousers[i], kNFA.NFAInput[j][0]); //这里的kNFA.NFAInput[j]其实是含有一个字符的字符串，所以只需要提起第一个就行啦
+            Closure temp = colouse_move(clousers[i], kNFA.NFAInput[j][0]);
             Closure temp2 = get_closure(temp);
             sort(temp2.cSet.begin(), temp2.cSet.end()); //排序，方便比对
             temp2 = chaveOver(temp2);                   //判断是否含有终结
-            if (!is_in_closures(temp2))
+            int tempIndex = is_in_closures(temp2);
+            if (tempIndex == -1)
             {
                 clousers.push_back(temp2);
+                clousers[i].dfa[kNFA.NFAInput[j][0] - 0] = clousers.size() - 1; //加入新的就把最新的下标存
+            }
+            else
+            {
+                clousers[i].dfa[kNFA.NFAInput[j][0] - 0] = tempIndex;
             }
         }
     }
+}
+void ShowDFA()
+{
+    for (int i = 0; i < clousers.size(); i++)
+    {
+        cout << "T_Index:" << i << " "
+             << "MoveTo: ";
+        for (int j = 0; j < kNFA.NFAInput.size(); j++)
+        {
+            if (kNFA.NFAInput[j][0] == '@') //这里的kNFA.NFAInput[j]其实是含有一个字符的字符串，所以只需要提起第一个就行啦
+                continue;
+            char temp = kNFA.NFAInput[j][0];
+            cout << "corss " << temp << " to " << clousers[i].dfa[temp - 0] << "; ";
+        }
+        cout << endl;
+    }
+}
+bool DFA(string str)
+{
+    int tempIndex = 0;
+    for (int i = 0; i < str.length(); i++)
+    {
+        tempIndex = clousers[tempIndex].dfa[str[i] - 0];
+    }
+    if (clousers[tempIndex].haveOver)
+        return true;
+    return false;
+}
+void slove()
+{
 }
