@@ -208,12 +208,6 @@ void ShowNFA()
             {
                 cout << char(i) << "->" << char(j) << kNFA.NFAMove[i][j].NFA_Point_State[k] << endl;
             }
-            // for (int k = 0; k < 200; k++)
-            // {
-            //     char temp = kNFA.NFAMove[i][j].NFA_Point_State[k];
-            //     if (temp != '#')
-            //         cout << char(i) << "->" << char(j) << temp << endl;
-            // }
         }
     }
 }
