@@ -23,26 +23,31 @@ struct Item               //项目
 {
     vector<Grammar> grammars; //项目里面包含的文法
 };
-vector<Item> items;            //项目集
-int isInStates(char ch);       //判断是否在状态里 存在则返回标号
-bool isInInputs(char ch);      //判断是否在输入字符里
-void getGrammar();             //读取文法
-void showGrammars();           //展示文法
-void showStats();              //展示状态
-bool ifAllInferEmptyConfirm(); //是否所有的能否推导空都已经确定了
-void ifInferEmpty();           //是否能推导出空 运行这个函数 直接让所有的状态是否能推导出空填入状态属性里
-void getFirsts();              //得到每个状态的first集
-
+vector<Item> items;             //项目集
+int isInStates(char ch);        //判断是否在状态里 存在则返回标号
+bool isInInputs(char ch);       //判断是否在输入字符里
+void getGrammar();              //读取文法
+void showGrammars();            //展示文法
+void showStats();               //展示状态
+bool ifAllInferEmptyConfirm();  //是否所有的能否推导空都已经确定了
+void ifInferEmpty();            //是否能推导出空 运行这个函数 直接让所有的状态是否能推导出空填入状态属性里
+bool insertFirst(int a, int b); //将states[b]的first集添加到states[a],如果有变化返回1 没变化返回0
+void getFirsts();               //得到每个状态的first集
+void showFirsts();              //展示First集合
+Item getClosures(Item i);
 int main()
 {
     getGrammar();
+    cout << "--------------------------------\n";
     showGrammars();
     cout << "--------------------------------\n";
     showStats();
-    cout << "--------------------------------\n";
     ifInferEmpty();
     cout << "--------------------------------\n";
     showStats();
+    getFirsts();
+    cout << "--------------------------------\n";
+    showFirsts();
 }
 int isInStates(char ch)
 {
@@ -221,48 +226,6 @@ void ifInferEmpty()
                     {
                         grammars[states[i].statesIndex[j]].ifInferEmpty = 1;
                     }
-                    // if (grammars[states[i].statesIndex[j]].str.length() <= 4)
-                    // {
-                    //     int tempStateIndex = isInStates(grammars[states[i].statesIndex[j]].str[3]);
-                    //     if (grammars[states[i].statesIndex[j]].str[3] == '@') //如果该文法能推导出空，则这个状态能推导出空
-                    //     {
-                    //         grammars[states[i].statesIndex[j]].ifInferEmpty = 1; //该文法能推导出空
-                    //         inferEmpty = true;
-                    //     }
-                    //     else if (tempStateIndex == -1) // input 该文法不能推导出空
-                    //     {
-                    //         grammars[states[i].statesIndex[j]].ifInferEmpty = 0;
-                    //     }
-                    //     else
-                    //     {
-                    //         if (states[tempStateIndex].ifInferEmpty != 1)
-                    //             ifConfirmEveryNotInferEmpty = false;
-                    //         else
-                    //         {
-                    //             inferEmpty = true;
-                    //         }
-                    //     }
-                    // }
-                    // else
-                    // {
-                    //     for (int k = 3; k < grammars[states[i].statesIndex[j]].str.length(); k++)
-                    //     {
-                    //         int tempStateIndex = isInStates(grammars[states[i].statesIndex[j]].str[k]);   //判断这个字符是否是状态还是input 是状态就返回状态下标
-                    //         if (tempStateIndex == -1 && grammars[states[i].statesIndex[j]].str[k] != '@') // input
-                    //         {
-                    //             grammars[states[i].statesIndex[j]].ifInferEmpty = 0; //该文法不能推导出空
-                    //         }
-                    //         else
-                    //         {
-                    //             if (states[tempStateIndex].ifInferEmpty != 1) //-1 0不知道 或者不能
-                    //                 ifConfirmEveryNotInferEmpty = false;
-                    //             // else
-                    //             // {
-                    //             //     inferEmpty = true;
-                    //             // }
-                    //         }
-                    //     }
-                    // }
                 }
             }
             if (inferEmpty == true && states[i].ifInferEmpty == -1)
@@ -275,16 +238,120 @@ void ifInferEmpty()
                 states[i].ifInferEmpty = 0;
                 continue;
             }
-            // if (ifConfirmEveryNotInferEmpty == true && states[i].ifInferEmpty == -1)
-            // {
-            //     states[i].ifInferEmpty = 0;
-            // }
         }
     }
 }
+bool insertFirst(int a, int b, bool ifPBEmpty) //将states[b]的first集添加到states[a],如果有变化返回1 没变化返回0
+{
+    sort(states[a].firsts.begin(), states[a].firsts.end());
+    sort(states[b].firsts.begin(), states[b].firsts.end());
+    int x, y;
+    x = states[b].firsts.size();
+    y = states[a].firsts.size();
+    bool flag = false;
+    for (int i = 0; i < x; i++)
+    {
+        bool found = false;
+        for (int j = 0; j < y; j++)
+        {
+            if (states[b].firsts[i] == states[a].firsts[j])
+            {
+                found = true;
+            }
+        }
+        if (!found)
+        {
+            if (states[b].firsts[i] == '@' && ifPBEmpty == false) //如果是空 但是不需要压入空
+                continue;
+            flag = true;
+            states[a].firsts.push_back(states[b].firsts[i]);
+        }
+    }
+    return flag;
+}
 void getFirsts()
 {
+    bool flag = false;
+    if (flag == false)
+    {
+        flag = true;
+        for (int i = 0; i < states.size(); i++)
+        {
+            for (int j = 0; j < states[i].statesIndex.size(); j++)
+            {
+                string str = grammars[states[i].statesIndex[j]].str;
+                for (int k = 3; k < str.length(); k++)
+                {
+                    if (isInInputs(str[k])) //如果是输入字符 那么直接压入first
+                    {
+                        if (str[k] != '@') //如果不是空
+                        {
+                            bool ifPbInput = false;
+                            for (int q = 0; q < states[i].firsts.size(); q++) //判断是否压入 程序简单 就不写函数了
+                            {
+                                if (str[k] == states[i].firsts[q])
+                                {
+                                    ifPbInput = true;
+                                    break;
+                                }
+                            }
+                            if (ifPbInput == false)
+                            {
+                                states[i].firsts.push_back(str[k]);
+                                flag = false;
+                            }
+                            break;
+                        }
+                        else //如果是空
+                        {
+                            if (k == str.length() - 1) //如果是最后一位
+                            {
+                                states[i].firsts.push_back(str[k]);
+                                flag = false;
+                                break;
+                            }
+                        }
+                    }
+                    else if (isInStates(str[k]) != -1) //如果是状态
+                    {
+                        int stateIndex = isInStates(str[k]);
+                        if (states[stateIndex].ifInferEmpty == 0) //如果该状态不能推出空
+                        {
+                            if (insertFirst(i, stateIndex, false)) // stateIndex 压入 i 如果有变化
+                                flag = false;
+                            break;
+                        }
+                        else if (states[stateIndex].ifInferEmpty == 1)
+                        {
+                            bool ifPBEmpty = false;
+                            if (k == str.length() - 1)
+                                ifPBEmpty = true;
+                            if (insertFirst(i, stateIndex, ifPBEmpty))
+                            {
+                                flag = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+void showFirsts()
+{
     for (int i = 0; i < states.size(); i++)
+    {
+        cout << "First(" << states[i].state << "): ";
+        for (int j = 0; j < states[i].firsts.size(); j++)
+        {
+            cout << states[i].firsts[j] << " ";
+        }
+        cout << endl;
+    }
+}
+Item getClosures(Item it)
+{
+    for (int i = 0; i < it.grammars.size(); i++)
     {
     }
 }
