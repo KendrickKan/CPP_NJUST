@@ -23,10 +23,12 @@ struct Item               //项目
 {
     vector<Grammar> grammars;         //项目里面包含的文法
     vector<pair<int, char>> gotoItem; //第一个代表指向的Item的下标 第二个代表转换的符号
+    vector<pair<char, int>> Action;   // Action表
+    vector<int> Goto;                 // Goto表
 };
 vector<Item> items;                          //项目集
 int isInStates(char ch);                     //判断是否在状态里 存在则返回标号
-bool isInInputs(char ch);                    //判断是否在输入字符里
+int isInInputs(char ch);                     //判断是否在输入字符里 存在则返回标号
 void getGrammar();                           //读取文法
 void showGrammars();                         //展示文法
 void showStats();                            //展示状态
@@ -42,6 +44,9 @@ bool ifItemAEuqalsItemB(Item ita, Item itb); //判断ItemA是否等于ItemB
 int ifTheItemInItems(Item it);               //判断这个Item是否已经存在 //返回-1不存在 否则返回下标
 void getItems();                             //得到所有的项目集
 void showItems();                            //展示所有的项目集
+void initActionAndGoto();                    //初始化Action表和Goto表
+void getActionAndGoto();                     //得到Action表和Goto表
+void showActionAndGoto();                    //展示Action表和Goto表
 int main()
 {
     getGrammar();
@@ -58,7 +63,9 @@ int main()
     getItems();
     cout << "--------------------------------\n";
     showItems();
-    system("pause");
+    getActionAndGoto();
+    showActionAndGoto();
+    // system("pause");
 }
 int isInStates(char ch)
 {
@@ -71,16 +78,16 @@ int isInStates(char ch)
     }
     return -1;
 }
-bool isInInputs(char ch)
+int isInInputs(char ch)
 {
     for (int i = 0; i < inputs.size(); i++)
     {
         if (ch == inputs[i])
         {
-            return true;
+            return i;
         }
     }
-    return false;
+    return -1;
 }
 void getGrammar()
 {
@@ -134,7 +141,7 @@ void getGrammar()
             for (int i = 3; i < line.size(); i++)
             {
 
-                if (!isInInputs(line[i]) && (line[i] < 'A' || line[i] > 'Z'))
+                if ((isInInputs(line[i]) == -1) && (line[i] < 'A' || line[i] > 'Z'))
                     inputs.push_back(line[i]); //存输入
             }
         }
@@ -206,7 +213,7 @@ void ifInferEmpty()
                     for (int k = 3; k < grammars[states[i].statesIndex[j]].str.length(); k++)
                     {
                         char tt = grammars[states[i].statesIndex[j]].str[k];
-                        if (isInInputs(grammars[states[i].statesIndex[j]].str[k]) && grammars[states[i].statesIndex[j]].str[k] != '@')
+                        if ((isInInputs(grammars[states[i].statesIndex[j]].str[k]) != -1) && grammars[states[i].statesIndex[j]].str[k] != '@')
                         {
                             grammars[states[i].statesIndex[j]].ifInferEmpty = 0; //这个文法不能推出空
                             break;
@@ -293,7 +300,7 @@ void getFirsts()
                 string str = grammars[states[i].statesIndex[j]].str;
                 for (int k = 3; k < str.length(); k++)
                 {
-                    if (isInInputs(str[k])) //如果是输入字符 那么直接压入first
+                    if (isInInputs(str[k]) != -1) //如果是输入字符 那么直接压入first
                     {
                         if (str[k] != '@') //如果不是空
                         {
@@ -366,11 +373,49 @@ Item getClosures(Item it)
     {
         int tempGrammarYuanDianIndex = it.grammars[i].index;
         int tempstateIndex = isInStates(it.grammars[i].str[tempGrammarYuanDianIndex]);
+        char tempCh; //用于计算向前搜索符
+        if (tempGrammarYuanDianIndex >= (it.grammars[i].str.length() - 1))
+        {
+            tempCh = '#';
+        }
+        else
+        {
+            tempCh = it.grammars[i].str[tempGrammarYuanDianIndex + 1];
+        }
         if (tempstateIndex != -1)
         {
-            for (int j = 0; j < states[tempstateIndex].statesIndex.size(); j++)
+            for (int j = 0; j < states[tempstateIndex].statesIndex.size(); j++) //遍历该状态为左边的所有文法
             {
-                it.grammars.push_back(grammars[states[tempstateIndex].statesIndex[j]]);
+                //求向前搜索符
+                Grammar tempg = grammars[states[tempstateIndex].statesIndex[j]];
+                if (tempCh != '#')
+                {
+                    int tempstateIndex2 = isInStates(tempCh);       //判断这个符号是不是一个状态 也就是非终结符
+                    if ((tempstateIndex2 == -1) && (tempCh != '@')) //如果不是非终结符 且不是空
+                    {
+                        vector<char> tempVec;
+                        tempVec.push_back(tempCh);
+                        tempg.searchCh = tempVec;
+                    }
+                    else if (tempstateIndex2 != -1) //是非终结符
+                    {
+                        if (states[tempstateIndex2].ifInferEmpty == false) //不能推出空
+                        {
+                            tempg.searchCh = states[tempstateIndex2].firsts; //那么直接替换就行啦
+                        }
+                        else //能推出空
+                        {
+                            for (int k = 0; k < states[tempstateIndex2].firsts.size(); k++)
+                            {
+                                if (states[tempstateIndex2].firsts[k] != '@') //这个first不为空的
+                                {
+                                    tempg.searchCh.push_back(states[tempstateIndex2].firsts[k]);
+                                }
+                            }
+                        }
+                    }
+                }
+                it.grammars.push_back(tempg);
             }
         }
     }
@@ -474,12 +519,135 @@ void showItems()
         cout << "I" << i << ":\n";
         for (int j = 0; j < items[i].grammars.size(); j++)
         {
-            cout << setw(10) << items[i].grammars[j].str << "   " << items[i].grammars[j].index << endl;
+            cout << setw(9) << items[i].grammars[j].str << "  圆点的位置：" << items[i].grammars[j].index;
+            cout << "    向前搜索符：";
+            for (int k = 0; k < items[i].grammars[j].searchCh.size(); k++)
+            {
+                cout << items[i].grammars[j].searchCh[k];
+                if (k < items[i].grammars[j].searchCh.size() - 1)
+                    cout << ",";
+            }
+            cout << endl;
         }
         for (int j = 0; j < items[i].gotoItem.size(); j++)
         {
             cout << "MoveTo I" << items[i].gotoItem[j].first << "  across: " << items[i].gotoItem[j].second << " \n";
         }
         cout << "--------------------------------\n";
+    }
+}
+void initActionAndGoto()
+{
+    for (int i = 0; i < items.size(); i++)
+    {
+        // init Action
+        for (int j = 0; j < inputs.size(); j++)
+        {
+            items[i].Action.push_back(make_pair('#', -1));
+        }
+        items[i].Action.push_back(make_pair('#', -1)); //添加'#'
+        // init Goto
+        for (int j = 0; j < states.size(); j++)
+        {
+            items[i].Goto.push_back(-1);
+        }
+    }
+}
+void getActionAndGoto()
+{
+    initActionAndGoto(); //初始化Action和Goto
+    for (int i = 0; i < items.size(); i++)
+    {
+        int t = 1;
+        for (int j = 0; j < items[i].grammars.size(); j++)
+        {
+            Grammar tempG = items[i].grammars[j];
+            if (tempG.index < tempG.str.length()) //不是归约
+            {
+                char tempCh = tempG.str[tempG.index];
+                int ifInInputs = isInInputs(tempCh);
+                int ifInStates = isInStates(tempCh);
+                int actionto;
+                for (int k = 0; k < items[i].gotoItem.size(); k++) //寻找action到哪
+                {
+                    if (items[i].gotoItem[k].second == tempCh)
+                    {
+                        actionto = items[i].gotoItem[k].first;
+                        break;
+                    }
+                }
+                if (ifInInputs != -1) //是终结符
+                {
+                    items[i].Action[ifInInputs] = make_pair('S', actionto);
+                }
+                else if (ifInStates != -1) //是非终结符
+                {
+                    items[i].Goto[ifInStates] = actionto;
+                }
+            }
+            else if (tempG.index == tempG.str.length()) //是归约
+            {
+                if (tempG.str[0] == '$') //如果是初态
+                {
+                    items[i].Action[items[i].Action.size() - 1] = make_pair('$', -2); //代表acc
+                    continue;
+                }
+                for (int k = 0; k < tempG.searchCh.size(); k++) //对每一个向前搜索符
+                {
+                    char tempCh = tempG.searchCh[k];
+                    if (tempCh != '#')
+                    {
+                        int ifInInputs = isInInputs(tempCh);
+                        items[i].Action[ifInInputs] = make_pair('r', tempG.num);
+                    }
+                    else
+                    {
+                        items[i].Action[items[i].Action.size() - 1] = make_pair('r', tempG.num);
+                    }
+                }
+            }
+        }
+    }
+}
+void showActionAndGoto()
+{
+    cout << "    States           Action           Goto\n";
+    cout << "             ";
+    for (int i = 0; i < inputs.size(); i++)
+    {
+        cout << inputs[i] << " ";
+    }
+    for (int i = 0; i < states.size(); i++)
+    {
+        if (states[i].state != '$')
+            cout << states[i].state << " ";
+    }
+    cout << endl;
+    for (int i = 0; i < items.size(); i++)
+    {
+        cout << "      " << i << "       ";
+        for (int j = 0; j < items[i].Action.size(); j++)
+        {
+            if (items[i].Action[j].second == -1)
+            {
+                cout << "  ";
+            }
+            else
+            {
+                cout << items[i].Action[j].first << items[i].Action[j].second << " ";
+            }
+        }
+        for (int j = 0; j < items[i].Goto.size(); j++)
+        {
+            if (items[i].Goto[j] == -1)
+            {
+                cout << "  ";
+            }
+            else
+            {
+                cout << items[i].Goto[j] << " ";
+            }
+        }
+        cout << endl;
     }
 }
