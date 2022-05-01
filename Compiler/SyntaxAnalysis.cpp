@@ -21,7 +21,8 @@ struct Grammar
 vector<Grammar> grammars; //文法集合
 struct Item               //项目
 {
-    vector<Grammar> grammars; //项目里面包含的文法
+    vector<Grammar> grammars;         //项目里面包含的文法
+    vector<pair<int, char>> gotoItem; //第一个代表指向的Item的下标 第二个代表转换的符号
 };
 vector<Item> items;                          //项目集
 int isInStates(char ch);                     //判断是否在状态里 存在则返回标号
@@ -39,8 +40,8 @@ bool ifItemAllGrammarUsed(Item it);          //该项目里是否所有的文法
 bool cmpGrammar(Grammar g1, Grammar g2);     //用于sort函数 排序一个项目里面的文法
 bool ifItemAEuqalsItemB(Item ita, Item itb); //判断ItemA是否等于ItemB
 int ifTheItemInItems(Item it);               //判断这个Item是否已经存在 //返回-1不存在 否则返回下标
-void getItems();
-void showItems();
+void getItems();                             //得到所有的项目集
+void showItems();                            //展示所有的项目集
 int main()
 {
     getGrammar();
@@ -57,7 +58,7 @@ int main()
     getItems();
     cout << "--------------------------------\n";
     showItems();
-    // system("pause");
+    system("pause");
 }
 int isInStates(char ch)
 {
@@ -455,7 +456,14 @@ void getItems()
             //这里需要判断这个tempIt是否已经存在了 而且是空的也不用加进去
             int iftempItInItems = ifTheItemInItems(tempIt);
             if ((tempIt.grammars.size() > 0) && (iftempItInItems == -1))
+            {
                 items.push_back(tempIt);
+                items[i].gotoItem.push_back(make_pair(items.size() - 1, tempCh));
+            }
+            else if (iftempItInItems != -1)
+            {
+                items[i].gotoItem.push_back(make_pair(iftempItInItems, tempCh));
+            }
         }
     }
 }
@@ -463,9 +471,14 @@ void showItems()
 {
     for (int i = 0; i < items.size(); i++)
     {
+        cout << "I" << i << ":\n";
         for (int j = 0; j < items[i].grammars.size(); j++)
         {
             cout << setw(10) << items[i].grammars[j].str << "   " << items[i].grammars[j].index << endl;
+        }
+        for (int j = 0; j < items[i].gotoItem.size(); j++)
+        {
+            cout << "MoveTo I" << items[i].gotoItem[j].first << "  across: " << items[i].gotoItem[j].second << " \n";
         }
         cout << "--------------------------------\n";
     }
