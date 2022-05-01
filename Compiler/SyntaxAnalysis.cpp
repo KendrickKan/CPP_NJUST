@@ -3,9 +3,9 @@ using namespace std;
 struct State //状态集
 {
     char state;
-    vector<char> firsts; // first集
-    int ifInferEmpty;    //是否能推导出空 0代表不能 1代表能 -1代表还没确定
-    vector<int> statesIndex;
+    vector<char> firsts;     // first集
+    int ifInferEmpty;        //是否能推导出空 0代表不能 1代表能 -1代表还没确定
+    vector<int> statesIndex; //所在的文法下标
 };
 vector<State> states;
 vector<char> inputs;
@@ -23,18 +23,24 @@ struct Item               //项目
 {
     vector<Grammar> grammars; //项目里面包含的文法
 };
-vector<Item> items;             //项目集
-int isInStates(char ch);        //判断是否在状态里 存在则返回标号
-bool isInInputs(char ch);       //判断是否在输入字符里
-void getGrammar();              //读取文法
-void showGrammars();            //展示文法
-void showStats();               //展示状态
-bool ifAllInferEmptyConfirm();  //是否所有的能否推导空都已经确定了
-void ifInferEmpty();            //是否能推导出空 运行这个函数 直接让所有的状态是否能推导出空填入状态属性里
-bool insertFirst(int a, int b); //将states[b]的first集添加到states[a],如果有变化返回1 没变化返回0
-void getFirsts();               //得到每个状态的first集
-void showFirsts();              //展示First集合
-Item getClosures(Item i);
+vector<Item> items;                          //项目集
+int isInStates(char ch);                     //判断是否在状态里 存在则返回标号
+bool isInInputs(char ch);                    //判断是否在输入字符里
+void getGrammar();                           //读取文法
+void showGrammars();                         //展示文法
+void showStats();                            //展示状态
+bool ifAllInferEmptyConfirm();               //是否所有的能否推导空都已经确定了
+void ifInferEmpty();                         //是否能推导出空 运行这个函数 直接让所有的状态是否能推导出空填入状态属性里
+bool insertFirst(int a, int b);              //将states[b]的first集添加到states[a],如果有变化返回1 没变化返回0
+void getFirsts();                            //得到每个状态的first集
+void showFirsts();                           //展示First集合
+Item getClosures(Item i);                    //得到一个项目闭包
+bool ifItemAllGrammarUsed(Item it);          //该项目里是否所有的文法都遍历用过一遍了
+bool cmpGrammar(Grammar g1, Grammar g2);     //用于sort函数 排序一个项目里面的文法
+bool ifItemAEuqalsItemB(Item ita, Item itb); //判断ItemA是否等于ItemB
+int ifTheItemInItems(Item it);               //判断这个Item是否已经存在 //返回-1不存在 否则返回下标
+void getItems();
+void showItems();
 int main()
 {
     getGrammar();
@@ -48,6 +54,10 @@ int main()
     getFirsts();
     cout << "--------------------------------\n";
     showFirsts();
+    getItems();
+    cout << "--------------------------------\n";
+    showItems();
+    // system("pause");
 }
 int isInStates(char ch)
 {
@@ -73,7 +83,7 @@ bool isInInputs(char ch)
 }
 void getGrammar()
 {
-    ifstream fs("LexicalAnalysisOLD.txt");
+    ifstream fs("SyntaxAnalysis.txt");
     if (fs.is_open())
     {
         string line;
@@ -353,5 +363,110 @@ Item getClosures(Item it)
 {
     for (int i = 0; i < it.grammars.size(); i++)
     {
+        int tempGrammarYuanDianIndex = it.grammars[i].index;
+        int tempstateIndex = isInStates(it.grammars[i].str[tempGrammarYuanDianIndex]);
+        if (tempstateIndex != -1)
+        {
+            for (int j = 0; j < states[tempstateIndex].statesIndex.size(); j++)
+            {
+                it.grammars.push_back(grammars[states[tempstateIndex].statesIndex[j]]);
+            }
+        }
+    }
+    return it;
+}
+bool ifItemAllGrammarUsed(Item it)
+{
+    for (int i = 0; i < it.grammars.size(); i++)
+    {
+        if (it.grammars[i].ifUse == false)
+            return false;
+    }
+    return true;
+}
+bool cmpGrammar(Grammar g1, Grammar g2)
+{
+    if (g1.num != g2.num)
+    {
+        return g1.num < g2.num;
+    }
+    return g1.index < g2.index;
+}
+bool ifItemAEuqalsItemB(Item ita, Item itb)
+{
+    if (ita.grammars.size() != itb.grammars.size())
+        return false;
+    sort(ita.grammars.begin(), ita.grammars.end(), cmpGrammar);
+    sort(itb.grammars.begin(), itb.grammars.end(), cmpGrammar);
+    for (int i = 0; i < ita.grammars.size(); i++)
+    {
+        if ((ita.grammars[i].num != itb.grammars[i].num) || (ita.grammars[i].index != itb.grammars[i].index))
+            return false;
+    }
+    return true;
+}
+int ifTheItemInItems(Item it) //返回-1不存在 否则返回下标
+{
+    for (int i = 0; i < items.size(); i++)
+    {
+        if (ifItemAEuqalsItemB(it, items[i]))
+            return i;
+    }
+    return -1;
+}
+void getItems()
+{
+    //一开始Items为空的
+    //初始项目
+    Item it;
+    it.grammars.push_back(grammars[0]); //第一步，将拓广文法添加到第一个项目中
+    it = getClosures(it);
+    items.push_back(it);
+    for (int i = 0; i < items.size(); i++)
+    {
+        while (!ifItemAllGrammarUsed(items[i])) //当这个项目集所有的项目还没被遍历使用完
+        {
+            char tempCh = '@'; //可以充当一个判断的作用 同时还有移动的字符的作用
+            Item tempIt;
+            for (int j = 0; j < items[i].grammars.size(); j++)
+            {
+                int tempGrammarYuanDianIndex = items[i].grammars[j].index;
+                if (tempGrammarYuanDianIndex == items[i].grammars[j].str.length())
+                {
+                    items[i].grammars[j].ifUse = true;
+                }
+                if (items[i].grammars[j].ifUse == false && tempGrammarYuanDianIndex < items[i].grammars[j].str.length())
+                {
+                    if (tempCh == '@')
+                    {
+                        tempCh = items[i].grammars[j].str[tempGrammarYuanDianIndex];
+                    }
+                    if (tempCh == items[i].grammars[j].str[tempGrammarYuanDianIndex])
+                    {
+                        items[i].grammars[j].ifUse = true;
+                        Grammar tempg = items[i].grammars[j];
+                        tempg.index++;
+                        tempg.ifUse = false;
+                        tempIt.grammars.push_back(tempg);
+                    }
+                }
+            }
+            tempIt = getClosures(tempIt);
+            //这里需要判断这个tempIt是否已经存在了 而且是空的也不用加进去
+            int iftempItInItems = ifTheItemInItems(tempIt);
+            if ((tempIt.grammars.size() > 0) && (iftempItInItems == -1))
+                items.push_back(tempIt);
+        }
+    }
+}
+void showItems()
+{
+    for (int i = 0; i < items.size(); i++)
+    {
+        for (int j = 0; j < items[i].grammars.size(); j++)
+        {
+            cout << setw(10) << items[i].grammars[j].str << "   " << items[i].grammars[j].index << endl;
+        }
+        cout << "--------------------------------\n";
     }
 }
