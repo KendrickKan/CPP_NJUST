@@ -1,5 +1,8 @@
-S->aAd
-S->bAc
-S->aec
-S->bed
-A->e
+S->3v<x>A
+A->Bw(){}
+B->a
+B->b
+B->c
+B->d
+B->e
+B->f

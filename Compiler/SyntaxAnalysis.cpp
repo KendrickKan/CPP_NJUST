@@ -290,7 +290,7 @@ bool insertFirst(int a, int b, bool ifPBEmpty) //将states[b]的first集添加�
 void getFirsts()
 {
     bool flag = false;
-    if (flag == false)
+    while (flag == false)
     {
         flag = true;
         for (int i = 0; i < states.size(); i++)

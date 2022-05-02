@@ -1,18 +1,16 @@
 #include <bits\stdc++.h>
 using namespace std;
-//尽可能的把关键字、运算符、限定符写全，不一定会用完
+//列举24个关键字、运算符、限定符写全，不一定会用完
+//把关键字映射到24个字母上 剩下两个字母 y，z分别代表标识符 常量
 vector<string> Keywords = {"char", "double", "float", "int", "long", "short",
-                           "unsigned", "signed", "struct", "union", "enum", "void",                           //数据类
-                           "for", "do", "while", "break", "continue",                                         //循环类
-                           "if", "else", "goto", "switch", "case", "default", "return",                       //条件类
-                           "const", "sizeof", "typedef", "include", "main", "iostream"};                      //其他类
-vector<string> MonocularOperators = {"+", "-", "*", "/", "!", "%", "~", "&", "|", "^", "="};                  //单目运算符
-vector<string> BinocularOperators = {"++", "--", "&&", "||", "<=", "!=", "==", ">=", "+=", "-=", "*=", "/="}; //双目运算符
-vector<string> Delimiters = {",", "(", ")", "{", "}", ";", "<", ">", "#"};                                    //限定符
-int Keywords_Number = Keywords.size();                                                                        //关键字数量
-int MonocularOperators_Number = MonocularOperators.size();                                                    //单目运算符数量
-int BinocularOperators_Number = BinocularOperators.size();                                                    //双目运算符数量
-int Delimiters_Number = Delimiters.size();
+                           "struct", "void",                                                                                                           //数据类
+                           "for", "do", "while", "break", "continue",                                                                                  //循环类
+                           "if", "else", "goto", "switch", "case", "default", "return",                                                                //条件类
+                           "const", "include", "main", "iostream"};                                                                                    //其他类
+vector<string> MonocularOperators = {"+", "-", "*", "/", "!", "%", "~", "&", "|", "^", "="};                                                           //单目运算符
+vector<string> BinocularOperators = {"++", "--", "&&", "||", "<=", "!=", "==", ">=", "+=", "-=", "*=", "/="};                                          //双目运算符
+vector<string> Delimiters = {",", "(", ")", "{", "}", ";", "<", ">", "#"};                                                                             //限定符
+char Letters[26] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'}; //限定符
 // NFA当输入一个的时候，所转向的是不确定的
 //所以将NFA的每一个状态所转向的状态当作一个结构
 char beginch;
@@ -41,7 +39,7 @@ struct Closure
 vector<Closure> clousers; //子集集合
 bool isInteger(char a);
 bool isLetter(char a);
-bool isKeyword(string a);
+int isKeyword(string a);
 bool isMonocularOperator(string a);
 bool isBinocularOperator(string a);
 bool isDelimiter(string a);
@@ -94,19 +92,19 @@ bool isLetter(char a)
         return true;
     return false;
 }
-bool isKeyword(string a)
+int isKeyword(string a)
 {
-    for (int i = 0; i < Keywords_Number; i++)
+    for (int i = 0; i < Keywords.size(); i++)
     {
         if (a == Keywords[i])
-            return true;
+            return i;
     }
-    return false;
+    return -1;
     //也可以用迭代器和find函数，但是没必要。
 }
 bool isMonocularOperator(string a)
 {
-    for (int i = 0; i < MonocularOperators_Number; i++)
+    for (int i = 0; i < MonocularOperators.size(); i++)
     {
         if (a == MonocularOperators[i])
             return true;
@@ -115,7 +113,7 @@ bool isMonocularOperator(string a)
 }
 bool isBinocularOperator(string a)
 {
-    for (int i = 0; i < BinocularOperators_Number; i++)
+    for (int i = 0; i < BinocularOperators.size(); i++)
     {
         if (a == BinocularOperators[i])
             return true;
@@ -124,7 +122,7 @@ bool isBinocularOperator(string a)
 }
 bool isDelimiter(string a)
 {
-    for (int i = 0; i < Delimiters_Number; i++)
+    for (int i = 0; i < Delimiters.size(); i++)
     {
         if (a == Delimiters[i])
             return true;
@@ -321,7 +319,7 @@ void ShowDFA()
 {
     for (int i = 0; i < clousers.size(); i++)
     {
-        cout << "T_Index:" << i  << "\nMoveToTable: \n";
+        cout << "T_Index:" << i << "\nMoveToTable: \n";
         for (int j = 0; j < kNFA.NFAInput.size(); j++)
         {
             if (kNFA.NFAInput[j][0] == '@') //这里的kNFA.NFAInput[j]其实是含有一个字符的字符串，所以只需要提起第一个就行啦
@@ -348,9 +346,9 @@ bool DFA(string str)
 void slove()
 {
     cout << "\n  token内容      类别          行号\n";
-
+    ofstream ofs("SyntaxAnalysisSourceProgram.txt");
     ifstream fs("LexicalAnalysisSourceProgram.txt");
-    if (fs.is_open())
+    if (fs.is_open() && ofs.is_open())
     {
         string line;
         int lineNum = 0; //代码所在行数
@@ -373,6 +371,7 @@ void slove()
                     }
                     if (DFA(checkStr))
                     {
+                        ofs << 'z';
                         cout << left << setw(15) << checkStr << " 常量            " << lineNum << endl;
                     }
                     else
@@ -391,14 +390,16 @@ void slove()
                     Letter:
                         int kkk;
                     }
-                    if (isKeyword(checkStr))
+                    if (isKeyword(checkStr) != -1)
                     {
+                        ofs << Letters[isKeyword(checkStr)];
                         cout << left << setw(15) << checkStr << " 关键字          " << lineNum << endl;
                     }
                     else
                     {
                         if (DFA(checkStr))
                         {
+                            ofs << 'y';
                             cout << left << setw(15) << checkStr << " 标识符          " << lineNum << endl;
                         }
                         else
@@ -411,6 +412,10 @@ void slove()
                 if (isDelimiter(checkStr))
                 {
                     i++;
+                    if (checkStr == "#")
+                        ofs << 3;
+                    else
+                        ofs << checkStr;
                     cout << left << setw(15) << checkStr << " 限定符          " << lineNum << endl;
                 }
                 else if (isMonocularOperator(checkStr))
@@ -421,15 +426,20 @@ void slove()
                     if (isBinocularOperator(tempCheckStr))
                     {
                         i++;
+                        ofs << 2;
                         cout << left << setw(15) << tempCheckStr << " 双目运算符      " << lineNum << endl;
                     }
                     else
+                    {
+                        ofs << 1;
                         cout << left << setw(15) << checkStr << " 单目运算符      " << lineNum << endl;
+                    }
                 }
                 if (line[i] == ' ' || line[i] == '\n' || line[i] == '\t')
                     i++;
             }
         }
         fs.close();
+        ofs.close();
     }
 }
