@@ -151,7 +151,7 @@ bool is_in_NFAInput(string str)
 }
 bool CreateNFA()
 {
-    ifstream fs("LexicalAnalysisOLD.txt");
+    ifstream fs("LexicalAnalysis.txt");
     if (fs.is_open())
     {
         bool fbegin = false;
@@ -163,11 +163,11 @@ bool CreateNFA()
             string strL;
             strL = line[0];
             char ch1 = line[0];
-            string strR = line.substr(3);
+            string strR = line.substr(3); //产生式右边部分
             // cout << strL << "" << strR << endl;
             if (!is_in_NFAState(strL)) //如果状态不存在，那就把它放进去
             {
-                if (!fbegin)
+                if (!fbegin) //第一个输入的就是初态
                 {
                     beginch = ch1;
                     fbegin = true;
@@ -175,8 +175,8 @@ bool CreateNFA()
                 kNFA.NFAState.push_back(strL);
             }
             string strR0;
-            strR0 = strR[0]; // String类型的
-            if (!is_in_NFAInput(strR0))
+            strR0 = strR[0];            // String类型的
+            if (!is_in_NFAInput(strR0)) //填入输入 也就是终态
             {
                 kNFA.NFAInput.push_back(strR0);
             }
@@ -188,7 +188,7 @@ bool CreateNFA()
             }
             else
             {
-                kNFA.NFAMove[ch1 - 0][strR[0] - 0].NFA_Point_State.push_back('Z');
+                kNFA.NFAMove[ch1 - 0][strR[0] - 0].NFA_Point_State.push_back('Z'); //终态既包含了直接到字母或者数字的那种，又包含了空
                 // kNFA.NFAMove[ch1 - 0][strR[0] - 0].NFA_Point_State[strR[1] - 0] = 'Z'; //终态既包含了直接到字母或者数字的那种，又包含了空
                 // kNFA.NFAMove[ch1 - 0][strR[0] - 0].num++;
             }
@@ -321,14 +321,13 @@ void ShowDFA()
 {
     for (int i = 0; i < clousers.size(); i++)
     {
-        cout << "T_Index:" << i << " "
-             << "MoveTo: ";
+        cout << "T_Index:" << i  << "\nMoveToTable: \n";
         for (int j = 0; j < kNFA.NFAInput.size(); j++)
         {
             if (kNFA.NFAInput[j][0] == '@') //这里的kNFA.NFAInput[j]其实是含有一个字符的字符串，所以只需要提起第一个就行啦
                 continue;
             char temp = kNFA.NFAInput[j][0];
-            cout << "corss " << temp << " to " << clousers[i].dfa[temp - 0] << "; ";
+            cout << "            corss " << temp << " to " << clousers[i].dfa[temp - 0] << "; \n";
         }
         cout << endl;
     }
@@ -339,6 +338,8 @@ bool DFA(string str)
     for (int i = 0; i < str.length(); i++)
     {
         tempIndex = clousers[tempIndex].dfa[str[i] - 0];
+        if (tempIndex == 0)
+            return false;
     }
     if (clousers[tempIndex].haveOver)
         return true;
@@ -346,7 +347,7 @@ bool DFA(string str)
 }
 void slove()
 {
-    cout << "\n       内容      类别    行号\n";
+    cout << "\n  token内容      类别          行号\n";
 
     ifstream fs("LexicalAnalysisSourceProgram.txt");
     if (fs.is_open())
@@ -367,41 +368,42 @@ void slove()
                     {
                         checkStr += line[i];
                         i++;
+                        if (isLetter(line[i]) && (line[i] != 'e' && line[i] != 'i'))
+                            goto Letter;
                     }
                     if (DFA(checkStr))
                     {
-                        cout << left << setw(15) << checkStr << " 常量      " << lineNum << endl;
+                        cout << left << setw(15) << checkStr << " 常量            " << lineNum << endl;
                     }
                     else
                     {
-                        cout << left << setw(15) << checkStr << " 非法常量   " << lineNum << endl;
+                        cout << left << setw(15) << checkStr << " 非法常量         " << lineNum << endl;
                     }
                 }
-                else if (isLetter(line[i]))
+                else if (isLetter(line[i]) || line[i] == '_')
                 {
                     checkStr += line[i];
                     i++;
-                    while (isLetter(line[i]) || isInteger(line[i]))
+                    while (isLetter(line[i]) || isInteger(line[i]) || line[i] == '_')
                     {
                         checkStr += line[i];
                         i++;
+                    Letter:
+                        int kkk;
                     }
                     if (isKeyword(checkStr))
                     {
-                        cout << left << setw(15) << checkStr << " 关键字    " << lineNum << endl;
+                        cout << left << setw(15) << checkStr << " 关键字          " << lineNum << endl;
                     }
                     else
                     {
                         if (DFA(checkStr))
                         {
-                            if (DFA(checkStr))
-                            {
-                                cout << left << setw(15) << checkStr << " 标识符    " << lineNum << endl;
-                            }
-                            else
-                            {
-                                cout << left << setw(15) << checkStr << " 非法标识符  " << lineNum << endl;
-                            }
+                            cout << left << setw(15) << checkStr << " 标识符          " << lineNum << endl;
+                        }
+                        else
+                        {
+                            cout << left << setw(15) << checkStr << " 非法标识符      " << lineNum << endl;
                         }
                     }
                 }
@@ -409,12 +411,20 @@ void slove()
                 if (isDelimiter(checkStr))
                 {
                     i++;
-                    cout << left << setw(15) << checkStr << " 限定符    " << lineNum << endl;
+                    cout << left << setw(15) << checkStr << " 限定符          " << lineNum << endl;
                 }
                 else if (isMonocularOperator(checkStr))
                 {
                     i++;
-                    cout << left << setw(15) << checkStr << " 运算符    " << lineNum << endl;
+                    string tempCheckStr = checkStr;
+                    tempCheckStr += line[i];
+                    if (isBinocularOperator(tempCheckStr))
+                    {
+                        i++;
+                        cout << left << setw(15) << tempCheckStr << " 双目运算符      " << lineNum << endl;
+                    }
+                    else
+                        cout << left << setw(15) << checkStr << " 单目运算符      " << lineNum << endl;
                 }
                 if (line[i] == ' ' || line[i] == '\n' || line[i] == '\t')
                     i++;
