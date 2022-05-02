@@ -1,1 +1,1 @@
-3v<x>dw(){dy;dy;tz;}
+3v<x>dw(){dy;dy;dy=z;dy=z;dy=z;y=z;y=z;y=z;tz;}

@@ -379,9 +379,13 @@ Item getClosures(Item it)
         int tempGrammarYuanDianIndex = it.grammars[i].index;
         int tempstateIndex = isInStates(it.grammars[i].str[tempGrammarYuanDianIndex]);
         char tempCh; //用于计算向前搜索符
-        if (tempGrammarYuanDianIndex >= (it.grammars[i].str.length() - 1))
+        if (tempGrammarYuanDianIndex >= it.grammars[i].str.length())
         {
             tempCh = '#';
+        }
+        else if (tempGrammarYuanDianIndex == (it.grammars[i].str.length() - 1))
+        {
+            tempCh = '@';
         }
         else
         {
@@ -401,6 +405,10 @@ Item getClosures(Item it)
                         vector<char> tempVec;
                         tempVec.push_back(tempCh);
                         tempg.searchCh = tempVec;
+                    }
+                    else if (tempCh == '@')
+                    {
+                        tempg.searchCh = it.grammars[i].searchCh;//直接继承上一个的向前搜索符
                     }
                     else if (tempstateIndex2 != -1) //是非终结符
                     {
@@ -704,6 +712,8 @@ void solve()
         char tempCh = vecStr[vecStr.size() - 1];
         int tempState = vecState[vecState.size() - 1];
         int ifInInputs = isInInputs(tempCh);
+        if (tempCh == '#')
+            ifInInputs = items[tempState].Action.size() - 1;
         char ifCh = items[tempState].Action[ifInInputs].first;  // Action第一项 判断S还是r
         int ifInt = items[tempState].Action[ifInInputs].second; // Action第二项
         if (ifCh == 'S')
