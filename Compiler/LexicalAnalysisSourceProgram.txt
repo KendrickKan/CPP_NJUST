@@ -3,13 +3,5 @@ int main()
 {
 	int a123;
 	int aa;
-	int _bc=1;
-	int _bcsd12=2;
-	int _dsf_dfa12_=123;
-	while (_bc!=_bcsd1234)
-	{
-		aa=0.123i;
-		_bc=10.23e+324;
-		_bcsd12=10.23e+324;
-	}
+	return 0;
 }

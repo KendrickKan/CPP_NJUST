@@ -47,6 +47,10 @@ void showItems();                            //展示所有的项目集
 void initActionAndGoto();                    //初始化Action表和Goto表
 void getActionAndGoto();                     //得到Action表和Goto表
 void showActionAndGoto();                    //展示Action表和Goto表
+void printChStack(vector<char> vec);
+void printStateStack(vector<int> vec);
+void printStrStack(vector<char> vec);
+void solve();
 int main()
 {
     getGrammar();
@@ -65,6 +69,7 @@ int main()
     showItems();
     getActionAndGoto();
     showActionAndGoto();
+    solve();
     // system("pause");
 }
 int isInStates(char ch)
@@ -649,5 +654,98 @@ void showActionAndGoto()
             }
         }
         cout << endl;
+    }
+}
+void printChStack(vector<char> vec)
+{
+    for (int i = 0; i < vec.size(); i++)
+    {
+        cout << vec[i];
+    }
+    cout << "      ";
+}
+void printStateStack(vector<int> vec)
+{
+    for (int i = 0; i < vec.size(); i++)
+    {
+        cout << vec[i] << " ";
+    }
+    cout << "      ";
+}
+void printStrStack(vector<char> vec)
+{
+    for (int i = vec.size() - 1; i >= 0; i--)
+    {
+        cout << vec[i];
+    }
+}
+void solve()
+{
+    ifstream fs("SyntaxAnalysisSourceProgram.txt");
+    string line;
+    if (fs.is_open())
+    {
+        getline(fs, line);
+        fs.close();
+    }
+    vector<char> vecStr;  //输入符号串
+    vector<char> vecCh;   //符号栈
+    vector<int> vecState; //状态栈
+    vecStr.push_back('#');
+    vecCh.push_back('#');
+    vecState.push_back(0);
+    for (int i = line.size() - 1; i >= 0; i--)
+    {
+        vecStr.push_back(line[i]);
+    }
+    bool flag = false;
+    while (!flag)
+    {
+        char tempCh = vecStr[vecStr.size() - 1];
+        int tempState = vecState[vecState.size() - 1];
+        int ifInInputs = isInInputs(tempCh);
+        char ifCh = items[tempState].Action[ifInInputs].first;  // Action第一项 判断S还是r
+        int ifInt = items[tempState].Action[ifInInputs].second; // Action第二项
+        if (ifCh == 'S')
+        {
+            vecState.push_back(ifInt); //状态入栈
+            vecCh.push_back(tempCh);   //符号入栈
+            vecStr.pop_back();         //输入串弹栈
+            printChStack(vecCh);
+            printStateStack(vecState);
+            printStrStack(vecStr);
+            cout << "移进";
+            cout << endl;
+        }
+        else if (ifCh == 'r')
+        {
+            Grammar tempG = grammars[ifInt];
+            int tempk = tempG.str.length() - 3;
+            char tempCha = tempG.str[0];          //产生式左部符号
+            int tempState2 = isInStates(tempCha); //产生式左部在哪
+            for (int i = 0; i < tempk; i++)
+            {
+                vecState.pop_back(); //弹出k个状态
+                vecCh.pop_back();    //符号栈弹栈
+            }
+            int tempState3 = vecState[vecState.size() - 1];         //当前状态栈顶
+            vecState.push_back(items[tempState3].Goto[tempState2]); //状态栈入栈
+            vecCh.push_back(tempCha);                               //符号栈入栈
+            printChStack(vecCh);
+            printStateStack(vecState);
+            printStrStack(vecStr);
+            cout << "归约:" << tempG.str;
+            cout << endl;
+        }
+        else if (ifCh == '$' && ifInt == -2)
+        {
+            flag = true;
+            cout << "---------Acc-----------";
+        }
+        else
+        {
+            flag = true;
+            cout << "---------Wrong-----------";
+        }
     }
 }

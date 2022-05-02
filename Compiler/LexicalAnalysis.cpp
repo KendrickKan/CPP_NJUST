@@ -1,7 +1,7 @@
 #include <bits\stdc++.h>
 using namespace std;
 //列举24个关键字、运算符、限定符写全，不一定会用完
-//把关键字映射到24个字母上 剩下两个字母 y，z分别代表标识符 常量
+//把关键字映射到24个字母上 剩下两个字母 y，z分别代表标识符 常量 1代表单目运算符 2代表双目运算符 3代表#
 vector<string> Keywords = {"char", "double", "float", "int", "long", "short",
                            "struct", "void",                                                                                                           //数据类
                            "for", "do", "while", "break", "continue",                                                                                  //循环类
@@ -431,7 +431,10 @@ void slove()
                     }
                     else
                     {
-                        ofs << 1;
+                        if (checkStr == "=")
+                            ofs << '=';
+                        else
+                            ofs << 1;
                         cout << left << setw(15) << checkStr << " 单目运算符      " << lineNum << endl;
                     }
                 }
