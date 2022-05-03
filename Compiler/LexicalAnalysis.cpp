@@ -55,6 +55,7 @@ void NFA_to_DFA();
 void ShowDFA();
 bool DFA(string str);
 void slove();
+ofstream Processfs("LexicalAnalysisProcess.txt");
 int main()
 {
     if (!CreateNFA())
@@ -345,6 +346,7 @@ bool DFA(string str)
 }
 void slove()
 {
+    Processfs << "  token内容      类别          行号\n";
     cout << "\n  token内容      类别          行号\n";
     ofstream ofs("SyntaxAnalysisSourceProgram.txt");
     ifstream fs("LexicalAnalysisSourceProgram.txt");
@@ -373,10 +375,12 @@ void slove()
                     {
                         ofs << 'z';
                         cout << left << setw(15) << checkStr << " 常量            " << lineNum << endl;
+                        Processfs << left << setw(15) << checkStr << " 常量            " << lineNum << endl;
                     }
                     else
                     {
                         cout << left << setw(15) << checkStr << " 非法常量         " << lineNum << endl;
+                        Processfs << left << setw(15) << checkStr << " 非法常量         " << lineNum << endl;
                     }
                 }
                 else if (isLetter(line[i]) || line[i] == '_')
@@ -388,12 +392,13 @@ void slove()
                         checkStr += line[i];
                         i++;
                     Letter:
-                        int kkk;
+                        int kkk; //没用
                     }
                     if (isKeyword(checkStr) != -1)
                     {
                         ofs << Letters[isKeyword(checkStr)];
                         cout << left << setw(15) << checkStr << " 关键字          " << lineNum << endl;
+                        Processfs << left << setw(15) << checkStr << " 关键字          " << lineNum << endl;
                     }
                     else
                     {
@@ -401,10 +406,12 @@ void slove()
                         {
                             ofs << 'y';
                             cout << left << setw(15) << checkStr << " 标识符          " << lineNum << endl;
+                            Processfs << left << setw(15) << checkStr << " 标识符          " << lineNum << endl;
                         }
                         else
                         {
                             cout << left << setw(15) << checkStr << " 非法标识符      " << lineNum << endl;
+                            Processfs << left << setw(15) << checkStr << " 非法标识符      " << lineNum << endl;
                         }
                     }
                 }
@@ -417,6 +424,7 @@ void slove()
                     else
                         ofs << checkStr;
                     cout << left << setw(15) << checkStr << " 限定符          " << lineNum << endl;
+                    Processfs << left << setw(15) << checkStr << " 限定符          " << lineNum << endl;
                 }
                 else if (isMonocularOperator(checkStr))
                 {
@@ -428,6 +436,7 @@ void slove()
                         i++;
                         ofs << 2;
                         cout << left << setw(15) << tempCheckStr << " 双目运算符      " << lineNum << endl;
+                        Processfs << left << setw(15) << tempCheckStr << " 双目运算符      " << lineNum << endl;
                     }
                     else
                     {
@@ -436,6 +445,7 @@ void slove()
                         else
                             ofs << 1;
                         cout << left << setw(15) << checkStr << " 单目运算符      " << lineNum << endl;
+                        Processfs << left << setw(15) << checkStr << " 单目运算符      " << lineNum << endl;
                     }
                 }
                 if (line[i] == ' ' || line[i] == '\n' || line[i] == '\t')

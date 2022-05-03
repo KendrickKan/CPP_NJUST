@@ -27,6 +27,7 @@ struct Item               //项目
     vector<int> Goto;                 // Goto表
 };
 vector<Item> items;                          //项目集
+int StrNum;                                  //输入符号串的长度
 int isInStates(char ch);                     //判断是否在状态里 存在则返回标号
 int isInInputs(char ch);                     //判断是否在输入字符里 存在则返回标号
 void getGrammar();                           //读取文法
@@ -48,9 +49,10 @@ void showItems();                            //展示所有的项目集
 void initActionAndGoto();                    //初始化Action表和Goto表
 void getActionAndGoto();                     //得到Action表和Goto表
 void showActionAndGoto();                    //展示Action表和Goto表
-void printChStack(vector<char> vec);
-void printStateStack(vector<int> vec);
-void printStrStack(vector<char> vec);
+void printChStack(vector<char> vec);         //打符号态栈
+void printStateStack(vector<int> vec);       //打印状态栈
+void printStrStack(vector<char> vec);        //打印输入符号串
+void solveWrong(vector<char> vec);           //处理错误信息
 void solve();
 ofstream ofs("SyntaxAnalysisProcess.txt");
 int main()
@@ -793,6 +795,47 @@ void printStrStack(vector<char> vec)
         cout << " ";
     }
 }
+void solveWrong(vector<char> vec)
+{
+    ifstream fs("LexicalAnalysisProcess.txt");
+    int i = -1;
+    int j = StrNum - vec.size();
+    string line;
+    while (i != j)
+    {
+        i++;
+        getline(fs, line);
+    }
+    int k = 0;
+    string ch;      //符号
+    string lineNum; //行号
+    bool flag = false;
+    for (int q = 0; q < line.size(); q++)
+    {
+        if (line[q] != ' ')
+        {
+            flag = false;
+            if (k == 0)
+            {
+                ch += line[q];
+            }
+            if (k == 2)
+            {
+                lineNum += line[q];
+            }
+        }
+        else
+        {
+            if (!flag)
+            {
+                k++;
+                flag = true;
+            }
+        }
+    }
+    ofs << "在行号为：" << lineNum << "  符号为：" << ch << " 出错";
+    cout << "在行号为：" << lineNum << "  符号为：" << ch << " 出错";
+}
 void solve()
 {
     ofs << "         符号栈                                   状态栈                                                       输入符号串                           动作 " << endl;
@@ -814,6 +857,7 @@ void solve()
     {
         vecStr.push_back(line[i]);
     }
+    StrNum = vecStr.size(); //输入符号串长度
     bool flag = false;
     while (!flag)
     {
@@ -866,9 +910,9 @@ void solve()
         else
         {
             flag = true;
-            ofs << "---------Wrong-----------\n";
+            ofs << "---------Wrong----NO-------\n";
             ofs << "可能的错误原因：\n";
-            cout << "---------Wrong-----------\n";
+            cout << "---------Wrong----NO-------\n";
             cout << "可能的错误原因：\n";
             for (int i = 0; i < items[tempState].Action.size(); i++)
             {
@@ -876,7 +920,8 @@ void solve()
                 {
                     ofs << "                在";
                     cout << "                在";
-                    printChStack(vecCh);
+                    solveWrong(vecStr);
+                    // printChStack(vecCh);
                     ofs << "之后缺少" << inputs[i] << endl;
                     cout << "之后缺少" << inputs[i] << endl;
                 }
