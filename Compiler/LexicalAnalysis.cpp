@@ -77,6 +77,8 @@ int main()
     ShowDFA();
     slove();
     // cout << 'a' - 0;
+    Processfs.close();
+    system("pause");
     return 0;
 }
 bool isInteger(char a)

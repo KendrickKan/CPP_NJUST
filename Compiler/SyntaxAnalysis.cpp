@@ -1,8 +1,13 @@
 #include <bits/stdc++.h>
 using namespace std;
-struct State //状态集
+vector<string> Keywords = {"char", "double", "float", "int", "long", "short",
+                           "struct", "void",                                            //数据类
+                           "for", "do", "while", "break", "continue",                   //循环类
+                           "if", "else", "goto", "switch", "case", "default", "return", //条件类
+                           "const", "include", "main", "iostream"};                     //其他类
+struct State                                                                            //状态集
 {
-    char state;
+    char state;              //状态符号 非终结符
     vector<char> firsts;     // first集
     int ifInferEmpty;        //是否能推导出空 0代表不能 1代表能 -1代表还没确定
     vector<int> statesIndex; //所在的文法下标
@@ -52,8 +57,9 @@ void showActionAndGoto();                    //展示Action表和Goto表
 void printChStack(vector<char> vec);         //打符号态栈
 void printStateStack(vector<int> vec);       //打印状态栈
 void printStrStack(vector<char> vec);        //打印输入符号串
-void solveWrong(vector<char> vec);           //处理错误信息
-void solve();
+void solveWrong(vector<char> vec);           //处理错误信息 在哪一行的什么后面出错
+string soveWrongPrompt(char ch);             //处理错误提示 出错的具体原因
+void solve();                                //进行判断是否acc
 ofstream ofs("SyntaxAnalysisProcess.txt");
 int main()
 {
@@ -76,7 +82,7 @@ int main()
     cout << "--------------------------------\n";
     solve();
     ofs.close();
-    // system("pause");
+    system("pause");
 }
 int isInStates(char ch)
 {
@@ -833,8 +839,47 @@ void solveWrong(vector<char> vec)
             }
         }
     }
-    ofs << "在行号为：" << lineNum << "  符号为：" << ch << " 出错";
-    cout << "在行号为：" << lineNum << "  符号为：" << ch << " 出错";
+    ofs << "在行号为：" << lineNum << "  符号为：" << ch << " 出错  ";
+    cout << "在行号为：" << lineNum << "  符号为：" << ch << " 出错  ";
+}
+string soveWrongPrompt(char ch)
+{
+    string str;
+    if (ch >= 'a' && ch <= 'z')
+    {
+        if (ch == 'z')
+        {
+            str = "常量";
+        }
+        else if (ch == 'y')
+        {
+            str = "标识符";
+        }
+        else
+        {
+            str = Keywords[ch - 'a'];
+        }
+    }
+    else
+    {
+        if (ch == '1')
+        {
+            str = "单目运算符";
+        }
+        else if (ch == '2')
+        {
+            str = "双目运算符";
+        }
+        else if (ch == '3')
+        {
+            str = "#";
+        }
+        else
+        {
+            str = ch;
+        }
+    }
+    return str;
 }
 void solve()
 {
@@ -918,12 +963,13 @@ void solve()
             {
                 if (items[tempState].Action[i].second != -1)
                 {
-                    ofs << "                在";
-                    cout << "                在";
+                    ofs << "                ";
+                    cout << "                ";
                     solveWrong(vecStr);
                     // printChStack(vecCh);
-                    ofs << "之后缺少" << inputs[i] << endl;
-                    cout << "之后缺少" << inputs[i] << endl;
+                    string strPrompt = soveWrongPrompt(inputs[i]);
+                    ofs << "可能是在此之后缺少: " << strPrompt << endl;
+                    cout << "可能是在此之后缺少: " << strPrompt << endl;
                 }
             }
         }
