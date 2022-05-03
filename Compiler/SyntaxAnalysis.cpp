@@ -42,6 +42,7 @@ bool ifItemAllGrammarUsed(Item it);          //该项目里是否所有的文法
 bool cmpGrammar(Grammar g1, Grammar g2);     //用于sort函数 排序一个项目里面的文法
 bool ifItemAEuqalsItemB(Item ita, Item itb); //判断ItemA是否等于ItemB
 int ifTheItemInItems(Item it);               //判断这个Item是否已经存在 //返回-1不存在 否则返回下标
+void LALR(Item tempIt, int iftempItInItems); // LALR（1）合并同心集
 void getItems();                             //得到所有的项目集
 void showItems();                            //展示所有的项目集
 void initActionAndGoto();                    //初始化Action表和Goto表
@@ -51,6 +52,7 @@ void printChStack(vector<char> vec);
 void printStateStack(vector<int> vec);
 void printStrStack(vector<char> vec);
 void solve();
+ofstream ofs("SyntaxAnalysisProcess.txt");
 int main()
 {
     getGrammar();
@@ -69,7 +71,9 @@ int main()
     showItems();
     getActionAndGoto();
     showActionAndGoto();
+    cout << "--------------------------------\n";
     solve();
+    ofs.close();
     // system("pause");
 }
 int isInStates(char ch)
@@ -96,7 +100,7 @@ int isInInputs(char ch)
 }
 void getGrammar()
 {
-    ifstream fs("SyntaxAnalysis.txt");
+    ifstream fs("SyntaxAnalysisGrammar.txt");
     if (fs.is_open())
     {
         string line;
@@ -307,17 +311,17 @@ void getFirsts()
                 {
                     if (isInInputs(str[k]) != -1) //如果是输入字符 那么直接压入first
                     {
+                        bool ifPbInput = false;
+                        for (int q = 0; q < states[i].firsts.size(); q++) //判断是否压入 程序简单 就不写函数了
+                        {
+                            if (str[k] == states[i].firsts[q])
+                            {
+                                ifPbInput = true;
+                                break;
+                            }
+                        }
                         if (str[k] != '@') //如果不是空
                         {
-                            bool ifPbInput = false;
-                            for (int q = 0; q < states[i].firsts.size(); q++) //判断是否压入 程序简单 就不写函数了
-                            {
-                                if (str[k] == states[i].firsts[q])
-                                {
-                                    ifPbInput = true;
-                                    break;
-                                }
-                            }
                             if (ifPbInput == false)
                             {
                                 states[i].firsts.push_back(str[k]);
@@ -327,7 +331,7 @@ void getFirsts()
                         }
                         else //如果是空
                         {
-                            if (k == str.length() - 1) //如果是最后一位
+                            if ((k == str.length() - 1) && ifPbInput == false) //如果是最后一位
                             {
                                 states[i].firsts.push_back(str[k]);
                                 flag = false;
@@ -362,13 +366,17 @@ void getFirsts()
 }
 void showFirsts()
 {
+    ofs << "--------------Firsts------------------\n";
     for (int i = 0; i < states.size(); i++)
     {
+        ofs << "First(" << states[i].state << "): ";
         cout << "First(" << states[i].state << "): ";
         for (int j = 0; j < states[i].firsts.size(); j++)
         {
+            ofs << states[i].firsts[j] << " ";
             cout << states[i].firsts[j] << " ";
         }
+        ofs << endl;
         cout << endl;
     }
 }
@@ -378,8 +386,8 @@ Item getClosures(Item it)
     {
         int tempGrammarYuanDianIndex = it.grammars[i].index;
         int tempstateIndex = isInStates(it.grammars[i].str[tempGrammarYuanDianIndex]);
-        char tempCh; //用于计算向前搜索符
-        if (tempGrammarYuanDianIndex >= it.grammars[i].str.length())
+        char tempCh;                                                 //用于计算向前搜索符
+        if (tempGrammarYuanDianIndex >= it.grammars[i].str.length()) //圆点已经到最后了
         {
             tempCh = '#';
         }
@@ -408,7 +416,7 @@ Item getClosures(Item it)
                     }
                     else if (tempCh == '@')
                     {
-                        tempg.searchCh = it.grammars[i].searchCh;//直接继承上一个的向前搜索符
+                        tempg.searchCh = it.grammars[i].searchCh; //直接继承上一个的向前搜索符
                     }
                     else if (tempstateIndex2 != -1) //是非终结符
                     {
@@ -473,6 +481,27 @@ int ifTheItemInItems(Item it) //返回-1不存在 否则返回下标
     }
     return -1;
 }
+void LALR(Item tempIt, int iftempItInItems)
+{
+    Item it = items[iftempItInItems];
+    for (int i = 0; i < tempIt.grammars.size(); i++)
+    {
+        for (int j = 0; j < tempIt.grammars[i].searchCh.size(); j++)
+        {
+            bool found = false;
+            for (int k = 0; k < it.grammars[i].searchCh.size(); k++)
+            {
+                if (tempIt.grammars[i].searchCh[j] == it.grammars[i].searchCh[k])
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+                it.grammars[i].searchCh.push_back(tempIt.grammars[i].searchCh[j]);
+        }
+    }
+}
 void getItems()
 {
     //一开始Items为空的
@@ -520,6 +549,8 @@ void getItems()
             }
             else if (iftempItInItems != -1)
             {
+                //存在，需要合并同心集,向前搜索符求和
+                LALR(tempIt, iftempItInItems);
                 items[i].gotoItem.push_back(make_pair(iftempItInItems, tempCh));
             }
         }
@@ -527,25 +558,36 @@ void getItems()
 }
 void showItems()
 {
+    ofs << "--------------Items------------------\n";
     for (int i = 0; i < items.size(); i++)
     {
+        ofs << "I" << i << ":\n";
         cout << "I" << i << ":\n";
         for (int j = 0; j < items[i].grammars.size(); j++)
         {
-            cout << setw(9) << items[i].grammars[j].str << "  圆点的位置：" << items[i].grammars[j].index;
+            ofs << left << setw(9) << items[i].grammars[j].str << "  圆点的位置：" << items[i].grammars[j].index;
+            ofs << "    向前搜索符：";
+            cout << left << setw(9) << items[i].grammars[j].str << "  圆点的位置：" << items[i].grammars[j].index;
             cout << "    向前搜索符：";
             for (int k = 0; k < items[i].grammars[j].searchCh.size(); k++)
             {
+                ofs << items[i].grammars[j].searchCh[k];
                 cout << items[i].grammars[j].searchCh[k];
                 if (k < items[i].grammars[j].searchCh.size() - 1)
+                {
+                    ofs << ",";
                     cout << ",";
+                }
             }
+            ofs << endl;
             cout << endl;
         }
         for (int j = 0; j < items[i].gotoItem.size(); j++)
         {
+            ofs << "MoveTo I" << items[i].gotoItem[j].first << "  across: " << items[i].gotoItem[j].second << " \n";
             cout << "MoveTo I" << items[i].gotoItem[j].first << "  across: " << items[i].gotoItem[j].second << " \n";
         }
+        ofs << "--------------------------------\n";
         cout << "--------------------------------\n";
     }
 }
@@ -624,43 +666,86 @@ void getActionAndGoto()
 }
 void showActionAndGoto()
 {
-    cout << "    States           Action           Goto\n";
-    cout << "             ";
+    ofs << "    States     ||                                            Action                                             ||              Goto\n";
+    ofs << "               || ";
+    cout << "    States     ||                                            Action                                             ||              Goto\n";
+    cout << "               || ";
     for (int i = 0; i < inputs.size(); i++)
     {
-        cout << inputs[i] << " ";
+        ofs << inputs[i] << " | ";
+        cout << inputs[i] << " | ";
     }
+    ofs << "# ||  ";
+    cout << "# ||  ";
     for (int i = 0; i < states.size(); i++)
     {
         if (states[i].state != '$')
-            cout << states[i].state << " ";
+        {
+            ofs << states[i].state << " | ";
+            cout << states[i].state << " | ";
+        }
     }
+    ofs << endl;
     cout << endl;
     for (int i = 0; i < items.size(); i++)
     {
+        ofs << "      " << i << "       ";
         cout << "      " << i << "       ";
+        if (i < 10)
+        {
+            ofs << " ";
+            cout << " ";
+        }
+        ofs << "||";
+        cout << "||";
         for (int j = 0; j < items[i].Action.size(); j++)
         {
             if (items[i].Action[j].second == -1)
             {
-                cout << "  ";
+                ofs << "   ";
+                cout << "   ";
+            }
+            else if (items[i].Action[j].second == -2)
+            {
+                ofs << "acc";
+                cout << "acc";
             }
             else
             {
-                cout << items[i].Action[j].first << items[i].Action[j].second << " ";
+                ofs << items[i].Action[j].first << items[i].Action[j].second;
+                cout << items[i].Action[j].first << items[i].Action[j].second;
+                if (items[i].Action[j].second < 10)
+                {
+                    ofs << " ";
+                    cout << " ";
+                }
             }
+            ofs << "|";
+            cout << "|";
         }
-        for (int j = 0; j < items[i].Goto.size(); j++)
+        ofs << "| ";
+        cout << "| ";
+        for (int j = 1; j < items[i].Goto.size(); j++)
         {
             if (items[i].Goto[j] == -1)
             {
-                cout << "  ";
+                ofs << "   ";
+                cout << "   ";
             }
             else
             {
+                if (items[i].Goto[j] < 10)
+                {
+                    ofs << " ";
+                    cout << " ";
+                }
+                ofs << items[i].Goto[j] << " ";
                 cout << items[i].Goto[j] << " ";
             }
+            ofs << "|";
+            cout << "|";
         }
+        ofs << endl;
         cout << endl;
     }
 }
@@ -668,27 +753,50 @@ void printChStack(vector<char> vec)
 {
     for (int i = 0; i < vec.size(); i++)
     {
+        ofs << vec[i];
         cout << vec[i];
     }
-    cout << "      ";
+    for (int i = 0; i < 24 - vec.size(); i++)
+    {
+        ofs << " ";
+        cout << " ";
+    }
 }
 void printStateStack(vector<int> vec)
 {
     for (int i = 0; i < vec.size(); i++)
     {
+        ofs << vec[i] << " ";
         cout << vec[i] << " ";
+        if (vec[i] < 10)
+        {
+            ofs << " ";
+            cout << " ";
+        }
     }
-    cout << "      ";
+    for (int i = 0; i < 70 - vec.size() * 3; i++)
+    {
+        ofs << " ";
+        cout << " ";
+    }
 }
 void printStrStack(vector<char> vec)
 {
     for (int i = vec.size() - 1; i >= 0; i--)
     {
+        ofs << vec[i];
         cout << vec[i];
+    }
+    for (int i = 0; i < 51 - vec.size(); i++)
+    {
+        ofs << " ";
+        cout << " ";
     }
 }
 void solve()
 {
+    ofs << "         符号栈                                   状态栈                                                       输入符号串                           动作 " << endl;
+    cout << "         符号栈                                   状态栈                                                       输入符号串                           动作 " << endl;
     ifstream fs("SyntaxAnalysisSourceProgram.txt");
     string line;
     if (fs.is_open())
@@ -712,7 +820,7 @@ void solve()
         char tempCh = vecStr[vecStr.size() - 1];
         int tempState = vecState[vecState.size() - 1];
         int ifInInputs = isInInputs(tempCh);
-        if (tempCh == '#')
+        if (tempCh == '#') //由于'#'不是inputs，所以我们这另判 因为之前把'#'加到了action的最后一项
             ifInInputs = items[tempState].Action.size() - 1;
         char ifCh = items[tempState].Action[ifInInputs].first;  // Action第一项 判断S还是r
         int ifInt = items[tempState].Action[ifInInputs].second; // Action第二项
@@ -724,8 +832,8 @@ void solve()
             printChStack(vecCh);
             printStateStack(vecState);
             printStrStack(vecStr);
-            cout << "移进";
-            cout << endl;
+            ofs << "移进\n";
+            cout << "移进\n";
         }
         else if (ifCh == 'r')
         {
@@ -744,18 +852,35 @@ void solve()
             printChStack(vecCh);
             printStateStack(vecState);
             printStrStack(vecStr);
+            ofs << "归约:" << tempG.str;
+            ofs << endl;
             cout << "归约:" << tempG.str;
             cout << endl;
         }
         else if (ifCh == '$' && ifInt == -2)
         {
             flag = true;
-            cout << "---------Acc-----------";
+            ofs << "---------Acc----YES-------\n";
+            cout << "---------Acc----YES-------\n";
         }
         else
         {
             flag = true;
-            cout << "---------Wrong-----------";
+            ofs << "---------Wrong-----------\n";
+            ofs << "可能的错误原因：\n";
+            cout << "---------Wrong-----------\n";
+            cout << "可能的错误原因：\n";
+            for (int i = 0; i < items[tempState].Action.size(); i++)
+            {
+                if (items[tempState].Action[i].second != -1)
+                {
+                    ofs << "                在";
+                    cout << "                在";
+                    printChStack(vecCh);
+                    ofs << "之后缺少" << inputs[i] << endl;
+                    cout << "之后缺少" << inputs[i] << endl;
+                }
+            }
         }
     }
 }
