@@ -366,12 +366,13 @@ void slove()
                 {
                     checkStr += line[i];
                     i++;
-                    while (isInteger(line[i]) || isLetter(line[i]) || line[i] == '.' || line[i] == '+' || line[i] == '-')
+                    // while (isInteger(line[i]) || isLetter(line[i]) || line[i] == '.' || line[i] == '+' || line[i] == '-')
+                    while (line[i] != ' ' && line[i] != '\n' && line[i] != '\t' && line[i] != '\0')
                     {
                         checkStr += line[i];
                         i++;
-                        if (isLetter(line[i]) && (line[i] != 'e' && line[i] != 'i'))
-                            goto Letter;
+                        // if (isLetter(line[i]) && (line[i] != 'e' && line[i] != 'i'))
+                        //     goto Letter;
                     }
                     if (DFA(checkStr))
                     {
@@ -381,20 +382,21 @@ void slove()
                     }
                     else
                     {
-                        cout << left << setw(15) << checkStr << " 非法常量         " << lineNum << endl;
-                        Processfs << left << setw(15) << checkStr << " 非法常量         " << lineNum << endl;
+                        cout << left << setw(15) << checkStr << " 非法常量        " << lineNum << endl;
+                        Processfs << left << setw(15) << checkStr << " 非法常量        " << lineNum << endl;
                     }
                 }
                 else if (isLetter(line[i]) || line[i] == '_')
                 {
                     checkStr += line[i];
                     i++;
-                    while (isLetter(line[i]) || isInteger(line[i]) || line[i] == '_')
+                    // while (isLetter(line[i]) || isInteger(line[i]) || line[i] == '_')
+                    while (line[i] != ' ' && line[i] != '\n' && line[i] != '\t' && line[i] != '\0')
                     {
                         checkStr += line[i];
                         i++;
-                    Letter:
-                        int kkk; //没用
+                        // Letter:
+                        //     int kkk; //没用
                     }
                     if (isKeyword(checkStr) != -1)
                     {
