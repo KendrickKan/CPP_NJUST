@@ -43,6 +43,7 @@ void ifInferEmpty();                         //是否能推导出空 运行这�
 bool insertFirst(int a, int b);              //将states[b]的first集添加到states[a],如果有变化返回1 没变化返回0
 void getFirsts();                            //得到每个状态的first集
 void showFirsts();                           //展示First集合
+Item grammarInItem(Grammar g, Item it);      //
 Item getClosures(Item i);                    //得到一个项目闭包
 bool ifItemAllGrammarUsed(Item it);          //该项目里是否所有的文法都遍历用过一遍了
 bool cmpGrammar(Grammar g1, Grammar g2);     //用于sort函数 排序一个项目里面的文法
@@ -388,6 +389,36 @@ void showFirsts()
         cout << endl;
     }
 }
+Item grammarInItem(Grammar g, Item it)
+{
+    for (int i = 0; i < it.grammars.size(); i++)
+    {
+        if (g.num == it.grammars[i].num && g.index == it.grammars[i].index)
+        {
+            sort(g.searchCh.begin(), g.searchCh.end());
+            sort(it.grammars[i].searchCh.begin(), it.grammars[i].searchCh.end());
+            for (int k = 0; k < g.searchCh.size(); k++)
+            {
+                bool found = false;
+                for (int j = 0; j < it.grammars[i].searchCh.size(); j++)
+                {
+                    if (g.searchCh[k] == it.grammars[i].searchCh[j])
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    it.grammars[i].searchCh.push_back(g.searchCh[k]);
+                }
+            }
+            return it;
+        }
+    }
+    it.grammars.push_back(g);
+    return it;
+}
 Item getClosures(Item it)
 {
     for (int i = 0; i < it.grammars.size(); i++)
@@ -444,7 +475,7 @@ Item getClosures(Item it)
                         }
                     }
                 }
-                it.grammars.push_back(tempg);
+                it = grammarInItem(tempg, it);
             }
         }
     }
@@ -475,8 +506,15 @@ bool ifItemAEuqalsItemB(Item ita, Item itb)
     sort(itb.grammars.begin(), itb.grammars.end(), cmpGrammar);
     for (int i = 0; i < ita.grammars.size(); i++)
     {
-        if ((ita.grammars[i].num != itb.grammars[i].num) || (ita.grammars[i].index != itb.grammars[i].index))
+        if ((ita.grammars[i].num != itb.grammars[i].num) || (ita.grammars[i].index != itb.grammars[i].index) || (ita.grammars[i].searchCh.size() != itb.grammars[i].searchCh.size()))
             return false;
+        sort(ita.grammars[i].searchCh.begin(), ita.grammars[i].searchCh.end());
+        sort(itb.grammars[i].searchCh.begin(), itb.grammars[i].searchCh.end());
+        for (int j = 0; j < ita.grammars[i].searchCh.size(); j++)
+        {
+            if (ita.grammars[i].searchCh[j] != itb.grammars[i].searchCh[j])
+                return false;
+        }
     }
     return true;
 }

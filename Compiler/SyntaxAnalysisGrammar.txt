@@ -21,6 +21,6 @@ J->z
 J->z1z
 J->z1y
 J->y1z
-J->z1y
+J->y1y
 K->y2;
 K->y=y2;
