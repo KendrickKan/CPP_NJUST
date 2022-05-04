@@ -5,7 +5,7 @@ vector<string> Keywords = {"char", "double", "float", "int", "long", "short",
                            "for", "do", "while", "break", "continue",                   //循环类
                            "if", "else", "goto", "switch", "case", "default", "return", //条件类
                            "const", "include", "main", "iostream"};                     //其他类
-struct State                                                                            //状态集
+struct State                 //状态
 {
     char state;              //状态符号 非终结符
     vector<char> firsts;     // first集
@@ -27,7 +27,7 @@ vector<Grammar> grammars; //文法集合
 struct Item               //项目
 {
     vector<Grammar> grammars;         //项目里面包含的文法
-    vector<pair<int, char>> gotoItem; //第一个代表指向的Item的下标 第二个代表转换的符号
+    vector<pair<int, char>> gotoItem; //第一个代表指向的Item的下标 第二个代表转换的符号S/r
     vector<pair<char, int>> Action;   // Action表
     vector<int> Goto;                 // Goto表
 };
@@ -43,7 +43,7 @@ void ifInferEmpty();                         //是否能推导出空 运行这�
 bool insertFirst(int a, int b);              //将states[b]的first集添加到states[a],如果有变化返回1 没变化返回0
 void getFirsts();                            //得到每个状态的first集
 void showFirsts();                           //展示First集合
-Item grammarInItem(Grammar g, Item it);      //
+Item grammarInItem(Grammar g, Item it);      //这个文法是否在项目里 返回新的项目
 Item getClosures(Item i);                    //得到一个项目闭包
 bool ifItemAllGrammarUsed(Item it);          //该项目里是否所有的文法都遍历用过一遍了
 bool cmpGrammar(Grammar g1, Grammar g2);     //用于sort函数 排序一个项目里面的文法

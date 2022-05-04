@@ -11,21 +11,20 @@ vector<string> MonocularOperators = {"+", "-", "*", "/", "!", "%", "~", "&", "|"
 vector<string> BinocularOperators = {"++", "--", "&&", "||", "<=", "!=", "==", ">=", "+=", "-=", "*=", "/="};                                          //双目运算符
 vector<string> Delimiters = {",", "(", ")", "{", "}", ";", "<", ">", "#"};                                                                             //限定符
 char Letters[26] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'}; //限定符
-// NFA当输入一个的时候，所转向的是不确定的
-//所以将NFA的每一个状态所转向的状态当作一个结构
+//初始状态字符
 char beginch;
+// NFA当输入一个的时候，所转向的是不确定的
+// 所以将NFA的每一个状态所转向的状态当作一个结构
 struct NFA_Point
 {
     vector<char> NFA_Point_State;
-    // int num;
 };
-// NFA存是将其转化为ASCALL码十进制值存在数组中                                                                    //限定符数量
+// NFA存是将其转化为ASCALL码十进制值存在数组中
 struct NFA
 {
     NFA_Point NFAMove[200][200];
-    vector<string> NFAState; //状态 "Z"为终态
-    vector<string> NFAInput;
-    // vector<string> NFAOver;
+    vector<string> NFAState; //非终结符 状态 "Z"为终态
+    vector<string> NFAInput; //终结符
 };
 NFA kNFA;
 //一个子集
@@ -36,25 +35,25 @@ struct Closure
     bool haveOver;       //用于判断是否含有终态
     int dfa[200] = {-1}; //下标就是输入的ASCAII的值，存的就是clousers的下标
 };
-vector<Closure> clousers; //子集集合
-bool isInteger(char a);
-bool isLetter(char a);
-int isKeyword(string a);
-bool isMonocularOperator(string a);
-bool isBinocularOperator(string a);
-bool isDelimiter(string a);
-bool is_in_NFAState(string str); //判断该状态是否存在于NFA中
-bool is_in_NFAInput(string str); //判断该输入字母是否存在于NFA中
-bool CreateNFA();
-void ShowNFA();
-bool is_in_closure(char a, Closure c); //判断该元素是否在子集
-Closure get_closure(Closure c);
-int is_in_closures(Closure c);
-Closure colouse_move(Closure c, char ch);
-void NFA_to_DFA();
-void ShowDFA();
-bool DFA(string str);
-void slove();
+vector<Closure> clousers;                 //子集集合
+bool isInteger(char a);                   //判断是否是数字
+bool isLetter(char a);                    //判断是否是字母
+int isKeyword(string a);                  //判断是否是关键字
+bool isMonocularOperator(string a);       //判断是否是单目运算符
+bool isBinocularOperator(string a);       //判断是否是双目运算符
+bool isDelimiter(string a);               //判断是否是限定符
+bool is_in_NFAState(string str);          //判断该状态是否存在于NFA中
+bool is_in_NFAInput(string str);          //判断该输入字母是否存在于NFA中
+bool CreateNFA();                         //建立NFA
+void ShowNFA();                           //建立DFA
+bool is_in_closure(char a, Closure c);    //判断该元素是否在子集
+Closure get_closure(Closure c);           //得到闭包
+int is_in_closures(Closure c);            //判断这个子集是否已经存在 不存在返回-1 存在返回标号
+Closure colouse_move(Closure c, char ch); //子集Move
+void NFA_to_DFA();                        // NFA转化为DFA
+void ShowDFA();                           //展示DFA
+bool DFA(string str);                     // DFA判断
+void slove();                             //程序运行函数
 ofstream Processfs("LexicalAnalysisProcess.txt");
 int main()
 {
@@ -184,14 +183,10 @@ bool CreateNFA()
             if (strR.size() >= 2) //说明右边还有递归
             {
                 kNFA.NFAMove[ch1 - 0][strR[0] - 0].NFA_Point_State.push_back(strR[1]);
-                // kNFA.NFAMove[ch1 - 0][strR[0] - 0].NFA_Point_State[strR[1] - 0] = strR[1]; // ch1-'0'代表他的十进制数
-                // kNFA.NFAMove[ch1 - 0][strR[0] - 0].num++;
             }
             else
             {
                 kNFA.NFAMove[ch1 - 0][strR[0] - 0].NFA_Point_State.push_back('Z'); //终态既包含了直接到字母或者数字的那种，又包含了空
-                // kNFA.NFAMove[ch1 - 0][strR[0] - 0].NFA_Point_State[strR[1] - 0] = 'Z'; //终态既包含了直接到字母或者数字的那种，又包含了空
-                // kNFA.NFAMove[ch1 - 0][strR[0] - 0].num++;
             }
         }
         fs.close();
@@ -228,7 +223,8 @@ Closure get_closure(Closure c)
     {
         for (int j = 0; j < kNFA.NFAMove[c.cSet[i] - 0]['@' - 0].NFA_Point_State.size(); j++)
         {
-            char temp = kNFA.NFAMove[c.cSet[i] - 0]['@' - 0].NFA_Point_State[j]; //从该状态经过空弧走到temp
+            //从该状态经过空弧走到temp
+            char temp = kNFA.NFAMove[c.cSet[i] - 0]['@' - 0].NFA_Point_State[j];
             if (!is_in_closure(temp, c))
             {
                 c.cSet.push_back(temp);
@@ -371,8 +367,6 @@ void slove()
                     {
                         checkStr += line[i];
                         i++;
-                        // if (isLetter(line[i]) && (line[i] != 'e' && line[i] != 'i'))
-                        //     goto Letter;
                     }
                     if (DFA(checkStr))
                     {
@@ -395,8 +389,6 @@ void slove()
                     {
                         checkStr += line[i];
                         i++;
-                        // Letter:
-                        //     int kkk; //没用
                     }
                     if (isKeyword(checkStr) != -1)
                     {
