@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 #include <sys/time.h>
-#include <omp.h>
 using namespace std;
 int main(int argc, char *argv[])
 {
@@ -11,8 +10,6 @@ int main(int argc, char *argv[])
     startTime = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000;
     long long steps = strtol(argv[1], NULL, 10);
     long long hits = 0;
-#pragma omp parallel for reduction(+ \
-                                   : hits)
     for (long long i = 0; i < steps; i++)
     {
         double x = 2.0 * rand() / RAND_MAX - 1.0;
@@ -28,5 +25,5 @@ int main(int argc, char *argv[])
     double realPi = 3.1415926535;
     double loss = abs(realPi - pi) / realPi;
     printf("\nPi = %.10lf  Loss = %.10lf  Cost = %lf ms\n\n", pi, loss, stopTime - startTime);
-    // cout << pi << " " << stopTime - startTime << endl;
+    return 0;
 }
