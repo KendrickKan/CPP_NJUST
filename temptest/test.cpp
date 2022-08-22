@@ -37,6 +37,14 @@ void read(T &t)
 typedef long long ll;
 typedef pair<int, int> pii;
 typedef pair<ll, ll> pll;
+void printstring(char a[])
+{
+    for (int i = 0; i < 9; i++)
+    {
+        cout << a[i] << " ";
+    }
+    cout << endl;
+}
 int main()
 {
     FastIO;
@@ -47,5 +55,7 @@ int main()
         cout << str1 << " " << str2 << endl;
     }
     // cout << (str1 < str2) << endl;
+    char _919106840420kandong[9] = {'k', 'a', 'n', 'd', 'o', 'n', 'g', 'k', 'k'};
+    printstring(_919106840420kandong);
     return 0;
 }
