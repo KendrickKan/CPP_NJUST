@@ -10,8 +10,8 @@ print(sum)
 
 
 
-sum=0
-for i in range(1,101):
+# sum=0
+for i in range(1,1001):
     if not(i%3==0 and i%8==0):
         continue
     print(i)
