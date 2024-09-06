@@ -5,20 +5,8 @@
         "-g",
         "${file}",
         "-o",
-        // "${fileBasenameNoExtension}.exe"
         "${fileDirname}/${fileBasenameNoExtension}.exe"
-        // $ {workspaceFolder} - 在VS Code中打开的文件夹的路径
-        // $ {workspaceFolderBasename} - VS代码中打开的文件夹的名称，没有任何斜杠（/）
-        // $ {file} - 当前打开的文件
-        // $ {relativeFile} - 当前打开的文件相对于workspaceFolder
-        // $ {fileBasename} - 当前打开文件的基本名称
-        // $ {fileBasenameNoExtension} - 当前打开文件的基本名称，没有文件扩展名
-        // $ {fileDirname} - 当前打开文件的目录名
-        // $ {fileExtname} - 当前打开文件的扩展名
-        // $ {cwd} - 任务运行器在启动时的当前工作目录
-        // $ {lineNumber} - 活动文件中当前选定的行号
-        // $ {selectedText} - 活动文件中当前选定的文本
-    ], // 编译命令参数
+    ],
     "problemMatcher": {
         "owner": "cpp",
         "fileLocation": [
@@ -33,5 +21,30 @@
             "severity": 4,
             "message": 5
         }
-    }
+    },
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "C/C++: g++.exe 生成活动文件",
+            "command": "D:/mingw64/bin/g++.exe",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "${file}",
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+            ],
+            "options": {
+                "cwd": "D:/mingw64/bin"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "调试器生成的任务。"
+        }
+    ]
 }
